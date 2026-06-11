@@ -259,6 +259,10 @@
             text-transform: uppercase;
         }
 
+        .result-card.highlight .result-label {
+            color: rgba(255,255,255,0.9);
+        }
+
         .result-value {
             font-size: 24px;
             font-weight: 700;
@@ -486,7 +490,7 @@
         </div>
 
         <div class="results-section">
-            <h2 class="section-title">Итоговые показатели</h2>
+            <h2 class="section-title" id="results-section-title">Итоговые показатели</h2>
             
             <div class="results-grid">
                 <div class="result-card">
@@ -727,6 +731,9 @@
             const totalForecastRev = m3ForecastRev;
             
             const romi = totalExp > 0 ? ((totalProjectedRev - totalExp) / totalExp * 100) : 0;
+            
+            const productName = productCoefficients[product].name;
+            document.getElementById('results-section-title').textContent = `Итоговые показатели — ${productName}`;
             
             document.getElementById('res-current').textContent = formatMoney(totalCurrentRev + totalForecastRev);
             document.getElementById('res-projected').textContent = formatMoney(totalProjectedRev);

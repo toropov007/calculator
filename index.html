@@ -636,7 +636,7 @@
 
         <!-- Results Section -->
         <div class="results-section">
-            <h2 class="section-title">📋 Итоговые показатели</h2>
+            <h2 class="section-title" id="results-section-title">📋 Итоговые показатели</h2>
             
             <div class="results-grid">
                 <div class="result-card">
@@ -983,6 +983,8 @@
             document.getElementById('badge-m3').textContent = `×${coefM1.toFixed(2)} (m1)`;
 
             // Update results cards
+            const productName = productCoefficients[product].name;
+            document.getElementById('results-section-title').textContent = `📋 Итоговые показатели — ${productName}`;
             document.getElementById('res-current').textContent = formatMoney(totalRev);
             document.getElementById('res-projected').textContent = formatMoney(totalProj);
             document.getElementById('res-expense').textContent = formatMoney(totalExp);
