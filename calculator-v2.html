@@ -1,1 +1,768 @@
-404: Not Found
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор дотекающей выручки v2 — Контур</title>
+    <style>
+        :root {
+            --kontur-blue: #3072c4;
+            --kontur-blue-hover: #205090;
+            --kontur-green: #3a9b39;
+            --kontur-red: #d4351c;
+            --kontur-orange: #f18e20;
+            --kontur-gray-100: #f5f5f5;
+            --kontur-gray-200: #e6e6e6;
+            --kontur-gray-300: #cdcdcd;
+            --kontur-gray-500: #8b8b8b;
+            --kontur-gray-700: #4a4a4a;
+            --kontur-gray-900: #1a1a1a;
+            --kontur-border: #d9d9d9;
+            --kontur-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f6f8;
+            color: var(--kontur-gray-900);
+            line-height: 1.5;
+            padding: 24px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .header {
+            background: white;
+            border-radius: 8px;
+            padding: 24px 32px;
+            margin-bottom: 16px;
+            box-shadow: var(--kontur-shadow);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        h1 { font-size: 24px; font-weight: 600; color: var(--kontur-gray-900); }
+
+        .product-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .product-selector label {
+            font-size: 14px;
+            color: var(--kontur-gray-700);
+        }
+
+        .product-selector select {
+            padding: 8px 32px 8px 12px;
+            border: 1px solid var(--kontur-border);
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            min-width: 200px;
+        }
+
+        .quarter-info {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            padding-top: 16px;
+            border-top: 1px solid var(--kontur-gray-200);
+        }
+
+        .quarter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .quarter-item label {
+            font-size: 12px;
+            color: var(--kontur-gray-500);
+            text-transform: uppercase;
+        }
+
+        .quarter-item .value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--kontur-gray-900);
+        }
+
+        .data-date-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--kontur-gray-200);
+        }
+
+        .input-section {
+            background: white;
+            border-radius: 8px;
+            padding: 24px 32px;
+            margin-bottom: 16px;
+            box-shadow: var(--kontur-shadow);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--kontur-gray-900);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--kontur-blue);
+        }
+
+        .months-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .month-block {
+            background: var(--kontur-gray-100);
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid transparent;
+        }
+
+        .month-block:hover {
+            border-color: var(--kontur-blue);
+        }
+
+        .month-block.completed {
+            border-left: 4px solid var(--kontur-green);
+        }
+
+        .month-block.current {
+            border-left: 4px solid var(--kontur-orange);
+            background: #fff8e6;
+        }
+
+        .month-block.future {
+            border-left: 4px solid var(--kontur-gray-300);
+            opacity: 0.7;
+        }
+
+        .month-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .month-status {
+            font-size: 12px;
+            color: var(--kontur-gray-500);
+            margin-bottom: 12px;
+        }
+
+        .coef-badge {
+            display: inline-block;
+            background: var(--kontur-blue);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--kontur-gray-500);
+            margin-bottom: 6px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--kontur-border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .forecast-calc {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        .forecast-calc .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid var(--kontur-gray-200);
+        }
+
+        .forecast-calc .row:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            color: var(--kontur-orange);
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 8px;
+            padding: 24px 32px;
+            box-shadow: var(--kontur-shadow);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .results-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 500px) {
+            .results-grid { grid-template-columns: 1fr; }
+        }
+
+        .result-card {
+            background: var(--kontur-gray-100);
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .result-card.highlight {
+            background: var(--kontur-blue);
+            color: white;
+        }
+
+        .result-label {
+            font-size: 12px;
+            color: var(--kontur-gray-500);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .result-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--kontur-gray-900);
+        }
+
+        .result-card.highlight .result-value {
+            color: white;
+        }
+
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .detail-table th {
+            text-align: left;
+            padding: 12px;
+            font-size: 12px;
+            color: var(--kontur-gray-500);
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--kontur-gray-200);
+        }
+
+        .detail-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--kontur-gray-200);
+            font-size: 14px;
+        }
+
+        .detail-table .number { text-align: right; font-family: monospace; }
+        .detail-table .total-row { background: var(--kontur-gray-100); font-weight: 600; }
+
+        .info-box {
+            background: #e8f4fd;
+            border-left: 4px solid var(--kontur-blue);
+            padding: 16px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <h1>Калькулятор дотекающей выручки v2</h1>
+                <div class="product-selector">
+                    <label for="product">Продукт:</label>
+                    <select id="product" onchange="applyProductCoefficients(); calculate();"></select>
+                </div>
+            </div>
+            
+            <div class="quarter-info">
+                <div class="quarter-item">
+                    <label>Текущий квартал</label>
+                    <span class="value" id="current-quarter">—</span>
+                </div>
+                <div class="quarter-item">
+                    <label>Период</label>
+                    <span class="value" id="quarter-period">—</span>
+                </div>
+                <div class="quarter-item">
+                    <label>Дней осталось</label>
+                    <span class="value" id="days-remaining">—</span>
+                </div>
+            </div>
+            
+            <div class="data-date-section">
+                <label for="data-date">Данные актуальны на:</label>
+                <input type="date" id="data-date" onchange="updateFromDataDate(); calculate();">
+            </div>
+        </div>
+
+        <div class="input-section">
+            <h2 class="section-title">Ввод данных по месяцам</h2>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--kontur-green);"></div>
+                    <span>Завершённый месяц</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--kontur-orange);"></div>
+                    <span>Текущий месяц</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--kontur-gray-300);"></div>
+                    <span>Будущий месяц</span>
+                </div>
+            </div>
+
+            <div class="months-container">
+                <div class="month-block" id="block-m1">
+                    <div class="month-title" id="title-m1">Месяц 1</div>
+                    <div class="month-status" id="status-m1">Завершён</div>
+                    <div class="coef-badge" id="coef-badge-m1">×1.00 (2 мес)</div>
+                    
+                    <div class="input-group">
+                        <label>Выручка с лидов этого месяца (включая дотёк следующего)</label>
+                        <input type="number" id="revenue-m1" placeholder="0" oninput="calculate()">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Расходы на рекламу</label>
+                        <input type="number" id="expense-m1" placeholder="0" oninput="calculate()">
+                    </div>
+                    
+                    <div class="forecast-calc" id="forecast-m1" style="display: none;">
+                        <div class="row">
+                            <span>Введено:</span>
+                            <span id="m1-input">0 ₽</span>
+                        </div>
+                        <div class="row">
+                            <span>× коэффициент:</span>
+                            <span id="m1-coef-val">2.00</span>
+                        </div>
+                        <div class="row">
+                            <span>Дотекающая:</span>
+                            <span id="m1-projected">0 ₽</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="month-block" id="block-m2">
+                    <div class="month-title" id="title-m2">Месяц 2</div>
+                    <div class="month-status" id="status-m2">Завершён</div>
+                    <div class="coef-badge" id="coef-badge-m2">×1.00 (1 мес)</div>
+                    
+                    <div class="input-group">
+                        <label>Выручка с лидов этого месяца</label>
+                        <input type="number" id="revenue-m2" placeholder="0" oninput="calculate()">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Расходы на рекламу</label>
+                        <input type="number" id="expense-m2" placeholder="0" oninput="calculate()">
+                    </div>
+                    
+                    <div class="forecast-calc" id="forecast-m2" style="display: none;">
+                        <div class="row">
+                            <span>Введено:</span>
+                            <span id="m2-input">0 ₽</span>
+                        </div>
+                        <div class="row">
+                            <span>× коэффициент:</span>
+                            <span id="m2-coef-val">1.15</span>
+                        </div>
+                        <div class="row">
+                            <span>Дотекающая:</span>
+                            <span id="m2-projected">0 ₽</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="month-block" id="block-m3">
+                    <div class="month-title" id="title-m3">Месяц 3</div>
+                    <div class="month-status" id="status-m3">Текущий</div>
+                    <div class="coef-badge" id="coef-badge-m3">×1.00 (1 мес) + прогноз</div>
+                    
+                    <div class="input-group">
+                        <label>Выручка на текущую дату</label>
+                        <input type="number" id="revenue-m3" placeholder="0" oninput="calculate()">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Расходы на текущую дату</label>
+                        <input type="number" id="expense-m3" placeholder="0" oninput="calculate()">
+                    </div>
+                    
+                    <div class="forecast-calc" id="forecast-m3">
+                        <div class="row">
+                            <span>Факт:</span>
+                            <span id="m3-fact-rev">0 ₽</span>
+                        </div>
+                        <div class="row">
+                            <span>Прогноз (ост. <span id="m3-days">0</span> дн):</span>
+                            <span id="m3-forecast-rev">+0 ₽</span>
+                        </div>
+                        <div class="row">
+                            <span>Всего к концу мес:</span>
+                            <span id="m3-full-rev">0 ₽</span>
+                        </div>
+                        <div class="row">
+                            <span>× коэффициент:</span>
+                            <span id="m3-coef-val">1.08</span>
+                        </div>
+                        <div class="row">
+                            <span>Дотекающая:</span>
+                            <span id="m3-projected">0 ₽</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>Как работает v2:</strong><br>
+                • <strong>Месяц 1</strong>: Введите выручку за этот месяц + дотёк следующего месяца (например, апрель + май), умножается на коэффициент 2 месяцев<br>
+                • <strong>Месяц 2</strong>: Введите только выручку этого месяца (например, только май), умножается на коэффициент 1 месяца<br>
+                • <strong>Месяц 3</strong>: Введите текущую выручку, калькулятор спрогнозирует оставшиеся дни и умножит на коэффициент 1 месяца
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h2 class="section-title">Итоговые показатели</h2>
+            
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="result-label">Фактическая выручка</div>
+                    <div class="result-value" id="res-current">0 ₽</div>
+                </div>
+                <div class="result-card highlight">
+                    <div class="result-label">Дотекающая выручка</div>
+                    <div class="result-value" id="res-projected">0 ₽</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Всего расходов</div>
+                    <div class="result-value" id="res-expense">0 ₽</div>
+                </div>
+                <div class="result-card highlight">
+                    <div class="result-label">ROMI</div>
+                    <div class="result-value" id="res-romi">0%</div>
+                </div>
+            </div>
+
+            <table class="detail-table">
+                <thead>
+                    <tr>
+                        <th>Месяц</th>
+                        <th class="number">Факт. выручка</th>
+                        <th class="number">Коэфф.</th>
+                        <th class="number">Дотекающая</th>
+                        <th class="number">Расходы</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="detail-name-m1">Месяц 1</td>
+                        <td class="number" id="detail-rev-m1">0 ₽</td>
+                        <td class="number" id="detail-coef-m1">×2.20</td>
+                        <td class="number" id="detail-proj-m1">0 ₽</td>
+                        <td class="number" id="detail-exp-m1">0 ₽</td>
+                    </tr>
+                    <tr>
+                        <td id="detail-name-m2">Месяц 2</td>
+                        <td class="number" id="detail-rev-m2">0 ₽</td>
+                        <td class="number" id="detail-coef-m2">×1.15</td>
+                        <td class="number" id="detail-proj-m2">0 ₽</td>
+                        <td class="number" id="detail-exp-m2">0 ₽</td>
+                    </tr>
+                    <tr>
+                        <td id="detail-name-m3">Месяц 3</td>
+                        <td class="number" id="detail-rev-m3">0 ₽</td>
+                        <td class="number" id="detail-coef-m3">×1.08</td>
+                        <td class="number" id="detail-proj-m3">0 ₽</td>
+                        <td class="number" id="detail-exp-m3">0 ₽</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>ИТОГО</td>
+                        <td class="number" id="detail-rev-total">0 ₽</td>
+                        <td class="number">—</td>
+                        <td class="number" id="detail-proj-total">0 ₽</td>
+                        <td class="number" id="detail-exp-total">0 ₽</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const productCoefficients = {
+            'product1': { m1: 2.20, m2: 1.15, m3: 1.08, name: 'КЭДО' },
+            'product2': { m1: 1.55, m2: 1.13, m3: 1.05, name: 'ТМФ' },
+            'product3': { m1: 1.75, m2: 1.21, m3: 1.10, name: 'Толк' },
+            'product4': { m1: 1.10, m2: 1.02, m3: 1.01, name: 'УЦ' },
+            'product5': { m1: 1.49, m2: 1.09, m3: 1.04, name: 'Маркет+ОФД' },
+            'product6': { m1: 1.42, m2: 1.16, m3: 1.06, name: 'Диадок' },
+            'product7': { m1: 2.83, m2: 1.55, m3: 1.26, name: 'Логистика' },
+            'product8': { m1: 1.95, m2: 1.37, m3: 1.10, name: 'EDI' },
+            'product9': { m1: 2.36, m2: 1.36, m3: 1.15, name: 'Маркировка' },
+            'product10': { m1: 1.74, m2: 1.13, m3: 1.03, name: 'Стрим' },
+            'product11': { m1: 1.44, m2: 1.15, m3: 1.06, name: 'Компас' },
+            'product12': { m1: 1.45, m2: 1.10, m3: 1.03, name: 'Закупки' },
+            'product13': { m1: 1.50, m2: 1.13, m3: 1.07, name: 'Бренд' },
+            'product14': { m1: 7.16, m2: 2.60, m3: 2.14, name: 'Эльба' },
+            'product15': { m1: 1.72, m2: 1.23, m3: 1.08, name: 'Отель' }
+        };
+
+        let currentDataDate = new Date();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+        });
+
+        function init() {
+            populateProductSelector();
+            setDefaultDataDate();
+            updateFromDataDate();
+            calculate();
+        }
+
+        function populateProductSelector() {
+            const select = document.getElementById('product');
+            select.innerHTML = '';
+            Object.keys(productCoefficients).forEach(key => {
+                const product = productCoefficients[key];
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = product.name;
+                select.appendChild(option);
+            });
+        }
+
+        function setDefaultDataDate() {
+            currentDataDate = new Date();
+            document.getElementById('data-date').valueAsDate = currentDataDate;
+        }
+
+        function applyProductCoefficients() {
+            const product = document.getElementById('product').value;
+            const coefs = productCoefficients[product];
+            if (coefs) {
+                updateCoefBadges(coefs);
+            }
+        }
+
+        function updateCoefBadges(coefs) {
+            document.getElementById('coef-badge-m1').textContent = `×${coefs.m1.toFixed(2)} (2 мес)`;
+            document.getElementById('coef-badge-m2').textContent = `×${coefs.m2.toFixed(2)} (1 мес)`;
+            document.getElementById('coef-badge-m3').textContent = `×${coefs.m3.toFixed(2)} (1 мес) + прогноз`;
+        }
+
+        function updateFromDataDate() {
+            const dataDateInput = document.getElementById('data-date').value;
+            if (!dataDateInput) return;
+            
+            currentDataDate = new Date(dataDateInput);
+            const year = currentDataDate.getFullYear();
+            const month = currentDataDate.getMonth();
+            const quarter = Math.floor(month / 3) + 1;
+            const quarterStartMonth = (quarter - 1) * 3;
+            const quarterEndMonth = quarterStartMonth + 2;
+            
+            const quarterNames = ['I', 'II', 'III', 'IV'];
+            const monthNames = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+            
+            document.getElementById('current-quarter').textContent = `${year} ${quarterNames[quarter - 1]} квартал`;
+            document.getElementById('quarter-period').textContent = `${monthNames[quarterStartMonth]} — ${monthNames[quarterEndMonth]}`;
+            
+            const months = [quarterStartMonth, quarterStartMonth + 1, quarterStartMonth + 2];
+            
+            months.forEach((m, i) => {
+                const monthStart = new Date(year, m, 1);
+                const monthEnd = new Date(year, m + 1, 0);
+                const daysInMonth = monthEnd.getDate();
+                
+                const block = document.getElementById(`block-m${i+1}`);
+                const title = document.getElementById(`title-m${i+1}`);
+                const status = document.getElementById(`status-m${i+1}`);
+                const forecast = document.getElementById(`forecast-m${i+1}`);
+                
+                title.textContent = monthNames[m];
+                
+                if (currentDataDate > monthEnd) {
+                    block.className = 'month-block completed';
+                    status.textContent = 'Завершён (полные данные)';
+                    forecast.style.display = 'block';
+                } else if (currentDataDate >= monthStart && currentDataDate <= monthEnd) {
+                    block.className = 'month-block current';
+                    status.textContent = `Текущий (${currentDataDate.getDate()} из ${daysInMonth} дн)`;
+                    forecast.style.display = 'block';
+                    if (i === 2) {
+                        document.getElementById('m3-days').textContent = daysInMonth - currentDataDate.getDate();
+                    }
+                } else {
+                    block.className = 'month-block future';
+                    status.textContent = 'Будущий (нет данных)';
+                    forecast.style.display = 'none';
+                }
+                
+                document.getElementById(`detail-name-m${i+1}`).textContent = monthNames[m];
+            });
+            
+            const quarterEnd = new Date(year, quarterEndMonth + 1, 0);
+            const daysRemaining = Math.ceil((quarterEnd - currentDataDate) / (1000 * 60 * 60 * 24));
+            document.getElementById('days-remaining').textContent = `${daysRemaining} дн`;
+            
+            applyProductCoefficients();
+        }
+
+        function formatMoney(amount) {
+            return new Intl.NumberFormat('ru-RU').format(Math.round(amount)) + ' ₽';
+        }
+
+        function calculate() {
+            const product = document.getElementById('product').value;
+            const coefs = productCoefficients[product];
+            if (!coefs) return;
+            
+            const year = currentDataDate.getFullYear();
+            const month = currentDataDate.getMonth();
+            const quarter = Math.floor(month / 3) + 1;
+            const quarterStartMonth = (quarter - 1) * 3;
+            
+            const revM1 = parseFloat(document.getElementById('revenue-m1').value) || 0;
+            const revM2 = parseFloat(document.getElementById('revenue-m2').value) || 0;
+            const revM3 = parseFloat(document.getElementById('revenue-m3').value) || 0;
+            
+            const expM1 = parseFloat(document.getElementById('expense-m1').value) || 0;
+            const expM2 = parseFloat(document.getElementById('expense-m2').value) || 0;
+            const expM3 = parseFloat(document.getElementById('expense-m3').value) || 0;
+            
+            const m3Start = new Date(year, quarterStartMonth + 2, 1);
+            const m3End = new Date(year, quarterStartMonth + 3, 0);
+            const daysInM3 = m3End.getDate();
+            const daysPassedM3 = currentDataDate >= m3Start && currentDataDate <= m3End ? currentDataDate.getDate() : 0;
+            const daysRemainingM3 = daysInM3 - daysPassedM3;
+            
+            let m3ForecastRev = 0;
+            let m3ForecastExp = 0;
+            let m3FullRev = revM3;
+            let m3FullExp = expM3;
+            
+            if (daysPassedM3 > 0 && revM3 > 0) {
+                const dailyRev = revM3 / daysPassedM3;
+                const dailyExp = expM3 / daysPassedM3;
+                m3ForecastRev = dailyRev * daysRemainingM3;
+                m3ForecastExp = dailyExp * daysRemainingM3;
+                m3FullRev = revM3 + m3ForecastRev;
+                m3FullExp = expM3 + m3ForecastExp;
+            }
+            
+            const projM1 = revM1 * coefs.m1;
+            const projM2 = revM2 * coefs.m2;
+            const projM3 = m3FullRev * coefs.m3;
+            
+            const totalCurrentRev = revM1 + revM2 + revM3;
+            const totalProjectedRev = projM1 + projM2 + projM3;
+            const totalExp = expM1 + expM2 + m3FullExp;
+            const totalForecastRev = m3ForecastRev;
+            
+            const romi = totalExp > 0 ? ((totalProjectedRev - totalExp) / totalExp * 100) : 0;
+            
+            document.getElementById('res-current').textContent = formatMoney(totalCurrentRev + totalForecastRev);
+            document.getElementById('res-projected').textContent = formatMoney(totalProjectedRev);
+            document.getElementById('res-expense').textContent = formatMoney(totalExp);
+            
+            const romiEl = document.getElementById('res-romi');
+            romiEl.textContent = romi.toFixed(1) + '%';
+            romiEl.className = 'result-value ' + (romi >= 0 ? 'positive' : 'negative');
+            
+            document.getElementById('m1-input').textContent = formatMoney(revM1);
+            document.getElementById('m1-coef-val').textContent = coefs.m1.toFixed(2);
+            document.getElementById('m1-projected').textContent = formatMoney(projM1);
+            document.getElementById('detail-rev-m1').textContent = formatMoney(revM1);
+            document.getElementById('detail-coef-m1').textContent = '×' + coefs.m1.toFixed(2);
+            document.getElementById('detail-proj-m1').textContent = formatMoney(projM1);
+            document.getElementById('detail-exp-m1').textContent = formatMoney(expM1);
+            
+            document.getElementById('m2-input').textContent = formatMoney(revM2);
+            document.getElementById('m2-coef-val').textContent = coefs.m2.toFixed(2);
+            document.getElementById('m2-projected').textContent = formatMoney(projM2);
+            document.getElementById('detail-rev-m2').textContent = formatMoney(revM2);
+            document.getElementById('detail-coef-m2').textContent = '×' + coefs.m2.toFixed(2);
+            document.getElementById('detail-proj-m2').textContent = formatMoney(projM2);
+            document.getElementById('detail-exp-m2').textContent = formatMoney(expM2);
+            
+            document.getElementById('m3-fact-rev').textContent = formatMoney(revM3);
+            document.getElementById('m3-forecast-rev').textContent = '+' + formatMoney(m3ForecastRev);
+            document.getElementById('m3-full-rev').textContent = formatMoney(m3FullRev);
+            document.getElementById('m3-coef-val').textContent = coefs.m3.toFixed(2);
+            document.getElementById('m3-projected').textContent = formatMoney(projM3);
+            document.getElementById('detail-rev-m3').textContent = formatMoney(revM3) + (m3ForecastRev > 0 ? ' + ' + formatMoney(m3ForecastRev) : '');
+            document.getElementById('detail-coef-m3').textContent = '×' + coefs.m3.toFixed(2);
+            document.getElementById('detail-proj-m3').textContent = formatMoney(projM3);
+            document.getElementById('detail-exp-m3').textContent = formatMoney(m3FullExp);
+            
+            document.getElementById('detail-rev-total').textContent = formatMoney(totalCurrentRev + totalForecastRev);
+            document.getElementById('detail-proj-total').textContent = formatMoney(totalProjectedRev);
+            document.getElementById('detail-exp-total').textContent = formatMoney(totalExp);
+        }
+    </script>
+</body>
+</html>
