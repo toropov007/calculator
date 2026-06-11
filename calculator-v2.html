@@ -583,7 +583,9 @@
         function init() {
             populateProductSelector();
             setDefaultDataDate();
+            loadSavedData();
             updateFromDataDate();
+            addAutoSaveListeners();
             calculate();
         }
 
@@ -772,6 +774,63 @@
             document.getElementById('detail-rev-total').textContent = formatMoney(totalCurrentRev + totalForecastRev);
             document.getElementById('detail-proj-total').textContent = formatMoney(totalProjectedRev);
             document.getElementById('detail-exp-total').textContent = formatMoney(totalExp);
+            
+            // Сохраняем данные
+            saveData();
+        }
+        
+        // Сохранение данных в localStorage
+        function saveData() {
+            const data = {
+                product: document.getElementById('product').value,
+                dataDate: document.getElementById('data-date').value,
+                revenue: {
+                    m1: document.getElementById('revenue-m1').value,
+                    m2: document.getElementById('revenue-m2').value,
+                    m3: document.getElementById('revenue-m3').value
+                },
+                expense: {
+                    m1: document.getElementById('expense-m1').value,
+                    m2: document.getElementById('expense-m2').value,
+                    m3: document.getElementById('expense-m3').value
+                }
+            };
+            localStorage.setItem('konturCalculator_v2', JSON.stringify(data));
+        }
+        
+        // Загрузка данных из localStorage
+        function loadSavedData() {
+            const saved = localStorage.getItem('konturCalculator_v2');
+            if (!saved) return;
+            
+            try {
+                const data = JSON.parse(saved);
+                
+                if (data.product) document.getElementById('product').value = data.product;
+                if (data.dataDate) document.getElementById('data-date').value = data.dataDate;
+                if (data.revenue) {
+                    if (data.revenue.m1) document.getElementById('revenue-m1').value = data.revenue.m1;
+                    if (data.revenue.m2) document.getElementById('revenue-m2').value = data.revenue.m2;
+                    if (data.revenue.m3) document.getElementById('revenue-m3').value = data.revenue.m3;
+                }
+                if (data.expense) {
+                    if (data.expense.m1) document.getElementById('expense-m1').value = data.expense.m1;
+                    if (data.expense.m2) document.getElementById('expense-m2').value = data.expense.m2;
+                    if (data.expense.m3) document.getElementById('expense-m3').value = data.expense.m3;
+                }
+            } catch (e) {
+                console.log('Ошибка загрузки сохранённых данных', e);
+            }
+        }
+        
+        // Добавление слушателей для авто-сохранения
+        function addAutoSaveListeners() {
+            const fields = ['revenue-m1', 'revenue-m2', 'revenue-m3', 'expense-m1', 'expense-m2', 'expense-m3'];
+            fields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('change', saveData);
+            });
+            document.getElementById('product')?.addEventListener('change', saveData);
         }
     </script>
 </body>
