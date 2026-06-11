@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💰 Калькулятор дотекающей выручки — PAY TO WIN Edition</title>
+    <style>
+        :root {
+            --kontur-blue: #3072c4;
+            --kontur-gold: #ffd700;
+            --kontur-gold-dark: #b8860b;
+            --kontur-green: #3a9b39;
+            --kontur-red: #d4351c;
+            --kontur-orange: #f18e20;
+            --kontur-gray-100: #f5f5f5;
+            --kontur-gray-200: #e6e6e6;
+            --kontur-gray-500: #8b8b8b;
+            --kontur-gray-900: #1a1a1a;
+            --kontur-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: var(--kontur-gray-900);
+            line-height: 1.5;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .header {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+            border-radius: 8px;
+            padding: 24px 32px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '💎';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 48px;
+            opacity: 0.3;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(-50%) translateX(10px); }
+        }
+
+        .premium-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        h1 { font-size: 24px; font-weight: 600; color: var(--kontur-gray-900); }
+
+        .input-section, .results-section {
+            background: white;
+            border-radius: 8px;
+            padding: 24px 32px;
+            margin-bottom: 16px;
+            box-shadow: var(--kontur-shadow);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--kontur-gray-900);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--kontur-gold);
+        }
+
+        .months-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .month-block {
+            background: var(--kontur-gray-100);
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .month-block:hover {
+            border-color: var(--kontur-gold);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+
+        .month-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--kontur-gray-900);
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--kontur-gray-500);
+            margin-bottom: 6px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--kontur-gold);
+        }
+
+        /* Donate Section */
+        .donate-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 24px;
+            color: white;
+            text-align: center;
+        }
+
+        .donate-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .donate-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .donate-form {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .donate-input {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 150px;
+            text-align: center;
+        }
+
+        .donate-btn {
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .donate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .donate-btn:active {
+            transform: translateY(0);
+        }
+
+        .boost-info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .boost-stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .boost-stat {
+            text-align: center;
+        }
+
+        .boost-stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--kontur-gold);
+        }
+
+        .boost-stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 900px) {
+            .results-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 500px) {
+            .results-grid { grid-template-columns: 1fr; }
+        }
+
+        .result-card {
+            background: var(--kontur-gray-100);
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .result-card.premium {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a1a2e;
+        }
+
+        .result-card.premium .result-label {
+            color: rgba(26, 26, 46, 0.7);
+        }
+
+        .result-card.premium .result-value {
+            color: #1a1a2e;
+        }
+
+        .vip-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4757;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .result-label {
+            font-size: 12px;
+            color: var(--kontur-gray-500);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .result-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--kontur-gray-900);
+        }
+
+        .result-value.positive { color: var(--kontur-green); }
+        .result-value.negative { color: var(--kontur-red); }
+
+        .product-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .product-selector select {
+            padding: 8px 32px 8px 12px;
+            border: 1px solid var(--kontur-gold-dark);
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            min-width: 200px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .next-level {
+            font-size: 12px;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="premium-badge">⭐ VIP Edition ⭐</div>
+            <h1>💰 Калькулятор дотекающей выручки</h1>
+            <p style="color: var(--kontur-gray-700); margin-top: 8px;">Pay-to-Win Edition — платите, чтобы побеждать!</p>
+            
+            <div class="product-selector">
+                <label for="product" style="font-weight: 600;">Выберите продукт:</label>
+                <select id="product" onchange="calculate()"></select>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <h2 class="section-title">📊 Ввод данных</h2>
+            
+            <div class="months-container">
+                <div class="month-block">
+                    <div class="month-title">Месяц 1 (×m3)</div>
+                    <div class="input-group">
+                        <label>Выручка</label>
+                        <input type="number" id="revenue-m1" placeholder="0" oninput="calculate()">
+                    </div>
+                    <div class="input-group">
+                        <label>Расходы</label>
+                        <input type="number" id="expense-m1" placeholder="0" oninput="calculate()">
+                    </div>
+                </div>
+
+                <div class="month-block">
+                    <div class="month-title">Месяц 2 (×m2)</div>
+                    <div class="input-group">
+                        <label>Выручка</label>
+                        <input type="number" id="revenue-m2" placeholder="0" oninput="calculate()">
+                    </div>
+                    <div class="input-group">
+                        <label>Расходы</label>
+                        <input type="number" id="expense-m2" placeholder="0" oninput="calculate()">
+                    </div>
+                </div>
+
+                <div class="month-block">
+                    <div class="month-title">Месяц 3 (×m1)</div>
+                    <div class="input-group">
+                        <label>Выручка</label>
+                        <input type="number" id="revenue-m3" placeholder="0" oninput="calculate()">
+                    </div>
+                    <div class="input-group">
+                        <label>Расходы</label>
+                        <input type="number" id="expense-m3" placeholder="0" oninput="calculate()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donate Section -->
+            <div class="donate-section">
+                <div class="donate-title">
+                    ⚡ Буст выручки
+                    <span style="font-size: 14px;">💎</span>
+                </div>
+                <div class="donate-subtitle">
+                    Каждые 500 ₽ = +0.5% к итоговой выручке! Чем больше донат — тем больше прибыль!
+                </div>
+                
+                <div class="donate-form">
+                    <input type="number" id="donate-amount" class="donate-input" placeholder="500" min="0" step="100">
+                    <button class="donate-btn" onclick="applyDonate()">💰 ПРИМЕНИТЬ БУСТ</button>
+                </div>
+                
+                <div class="boost-info">
+                    <div class="boost-stats">
+                        <div class="boost-stat">
+                            <div class="boost-stat-value" id="donate-total">0 ₽</div>
+                            <div class="boost-stat-label">Всего вложено</div>
+                        </div>
+                        <div class="boost-stat">
+                            <div class="boost-stat-value" id="boost-percent">+0%</div>
+                            <div class="boost-stat-label">Буст выручки</div>
+                        </div>
+                        <div class="boost-stat">
+                            <div class="boost-stat-value" id="boost-bonus">0 ₽</div>
+                            <div class="boost-stat-label">Бонус</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="boost-progress" style="width: 0%"></div>
+                    </div>
+                    <div class="next-level" id="next-level-text">Вложите ещё 500 ₽ для следующего уровня!</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h2 class="section-title" id="results-title">📋 Итоговые показатели</h2>
+            
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="result-label">Базовая выручка</div>
+                    <div class="result-value" id="res-base">0 ₽</div>
+                </div>
+                <div class="result-card premium">
+                    <div class="vip-badge">VIP</div>
+                    <div class="result-label">Выручка с бустом</div>
+                    <div class="result-value" id="res-boosted">0 ₽</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Всего расходов</div>
+                    <div class="result-value" id="res-expense">0 ₽</div>
+                </div>
+                <div class="result-card premium">
+                    <div class="vip-badge">PRO</div>
+                    <div class="result-label">ROMI</div>
+                    <div class="result-value" id="res-romi">0%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const productCoefficients = {
+            'product1': { m1: 2.20, m2: 1.32, m3: 1.08, name: 'КЭДО' },
+            'product2': { m1: 1.55, m2: 1.13, m3: 1.05, name: 'ТМФ' },
+            'product3': { m1: 1.75, m2: 1.21, m3: 1.10, name: 'Толк' },
+            'product4': { m1: 1.60, m2: 1.30, m3: 1.15, name: 'УЦ' }
+        };
+
+        let totalDonated = 0;
+        let currentBoostPercent = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            populateProducts();
+            loadData();
+            calculate();
+        });
+
+        function populateProducts() {
+            const select = document.getElementById('product');
+            Object.keys(productCoefficients).forEach(key => {
+                const product = productCoefficients[key];
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = product.name;
+                select.appendChild(option);
+            });
+        }
+
+        function formatMoney(amount) {
+            return new Intl.NumberFormat('ru-RU').format(Math.round(amount)) + ' ₽';
+        }
+
+        function applyDonate() {
+            const amount = parseFloat(document.getElementById('donate-amount').value) || 0;
+            if (amount < 0) return;
+            
+            totalDonated += amount;
+            currentBoostPercent = (totalDonated / 500) * 0.5;
+            
+            document.getElementById('donate-amount').value = '';
+            updateBoostDisplay();
+            calculate();
+            saveData();
+        }
+
+        function updateBoostDisplay() {
+            document.getElementById('donate-total').textContent = formatMoney(totalDonated);
+            document.getElementById('boost-percent').textContent = '+' + currentBoostPercent.toFixed(1) + '%';
+            
+            // Прогресс к следующему уровню
+            const nextLevel = Math.ceil((totalDonated + 1) / 500) * 500;
+            const currentLevel = Math.floor(totalDonated / 500) * 500;
+            const progress = ((totalDonated - currentLevel) / 500) * 100;
+            document.getElementById('boost-progress').style.width = progress + '%';
+            
+            const remaining = nextLevel - totalDonated;
+            if (remaining <= 0) {
+                document.getElementById('next-level-text').textContent = 'Уровень максимален! 🎉';
+            } else {
+                document.getElementById('next-level-text').textContent = `Вложите ещё ${formatMoney(remaining)} для +0.5% буста!`;
+            }
+        }
+
+        function calculate() {
+            const product = document.getElementById('product').value;
+            const coefs = productCoefficients[product];
+            if (!coefs) return;
+            
+            document.getElementById('results-title').textContent = `📋 Итоговые показатели — ${coefs.name}`;
+            
+            const revM1 = parseFloat(document.getElementById('revenue-m1').value) || 0;
+            const revM2 = parseFloat(document.getElementById('revenue-m2').value) || 0;
+            const revM3 = parseFloat(document.getElementById('revenue-m3').value) || 0;
+            
+            const expM1 = parseFloat(document.getElementById('expense-m1').value) || 0;
+            const expM2 = parseFloat(document.getElementById('expense-m2').value) || 0;
+            const expM3 = parseFloat(document.getElementById('expense-m3').value) || 0;
+            
+            // Расчёт дотекающей выручки
+            const projM1 = revM1 * coefs.m3;
+            const projM2 = revM2 * coefs.m2;
+            const projM3 = revM3 * coefs.m1;
+            
+            const baseProjected = projM1 + projM2 + projM3;
+            const totalExpense = expM1 + expM2 + expM3;
+            
+            // Применяем буст
+            const boostMultiplier = 1 + (currentBoostPercent / 100);
+            const boostedProjected = baseProjected * boostMultiplier;
+            const boostBonus = boostedProjected - baseProjected;
+            
+            // ROMI
+            const baseRom = totalExpense > 0 ? ((baseProjected - totalExpense) / totalExpense * 100) : 0;
+            const boostedRom = totalExpense > 0 ? ((boostedProjected - totalExpense) / totalExpense * 100) : 0;
+            
+            document.getElementById('res-base').textContent = formatMoney(baseProjected);
+            document.getElementById('res-boosted').textContent = formatMoney(boostedProjected);
+            document.getElementById('res-expense').textContent = formatMoney(totalExpense);
+            
+            const romiEl = document.getElementById('res-romi');
+            romiEl.textContent = boostedRom.toFixed(1) + '%';
+            romiEl.className = 'result-value ' + (boostedRom >= 0 ? 'positive' : 'negative');
+            
+            document.getElementById('boost-bonus').textContent = formatMoney(boostBonus);
+            
+            saveData();
+        }
+
+        function saveData() {
+            const data = {
+                product: document.getElementById('product').value,
+                revenue: {
+                    m1: document.getElementById('revenue-m1').value,
+                    m2: document.getElementById('revenue-m2').value,
+                    m3: document.getElementById('revenue-m3').value
+                },
+                expense: {
+                    m1: document.getElementById('expense-m1').value,
+                    m2: document.getElementById('expense-m2').value,
+                    m3: document.getElementById('expense-m3').value
+                },
+                donated: totalDonated,
+                boostPercent: currentBoostPercent
+            };
+            localStorage.setItem('konturCalculator_pay2win', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('konturCalculator_pay2win');
+            if (!saved) return;
+            
+            try {
+                const data = JSON.parse(saved);
+                
+                if (data.product) document.getElementById('product').value = data.product;
+                if (data.revenue) {
+                    if (data.revenue.m1) document.getElementById('revenue-m1').value = data.revenue.m1;
+                    if (data.revenue.m2) document.getElementById('revenue-m2').value = data.revenue.m2;
+                    if (data.revenue.m3) document.getElementById('revenue-m3').value = data.revenue.m3;
+                }
+                if (data.expense) {
+                    if (data.expense.m1) document.getElementById('expense-m1').value = data.expense.m1;
+                    if (data.expense.m2) document.getElementById('expense-m2').value = data.expense.m2;
+                    if (data.expense.m3) document.getElementById('expense-m3').value = data.expense.m3;
+                }
+                if (data.donated) totalDonated = data.donated;
+                if (data.boostPercent) currentBoostPercent = data.boostPercent;
+                
+                updateBoostDisplay();
+            } catch (e) {
+                console.log('Ошибка загрузки', e);
+            }
+        }
+    </script>
+</body>
+</html>
