@@ -486,11 +486,7 @@
                 <div class="product-selector">
                     <label for="product">Продукт:</label>
                     <select id="product" onchange="applyProductCoefficients(); calculate();">
-                        <!-- Редактируйте этот список под свои продукты -->
-                        <option value="product1">Основной продукт</option>
-                        <option value="product2">Дополнительный сервис</option>
-                        <option value="product3">Премиум тариф</option>
-                        <option value="product4">Консалтинг</option>
+                        <!-- Названия продуктов подтягиваются автоматически из productCoefficients -->
                     </select>
                 </div>
             </div>
@@ -768,6 +764,23 @@
             
             // Set default data date to today
             document.getElementById('data-date').valueAsDate = today;
+            
+            // Заполняем селектор продуктов из productCoefficients
+            populateProductSelector();
+        }
+        
+        // Функция заполнения селектора продуктов из productCoefficients
+        function populateProductSelector() {
+            const select = document.getElementById('product');
+            select.innerHTML = ''; // Очищаем текущие опции
+            
+            Object.keys(productCoefficients).forEach(key => {
+                const product = productCoefficients[key];
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = product.name;
+                select.appendChild(option);
+            });
         }
 
         function formatMoney(amount) {
