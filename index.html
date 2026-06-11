@@ -523,15 +523,15 @@
                 <div class="coef-settings-title">Коэффициенты дотека (когортный анализ)</div>
                 <div class="coef-row">
                     <div class="coef-item">
-                        <label>1-й мес → дотёк</label>
+                        <label>m1 — 1 месяц оплат</label>
                         <input type="number" id="coef-m1" step="0.01" value="1.25" onchange="calculate()">
                     </div>
                     <div class="coef-item">
-                        <label>2-й мес → дотёк</label>
+                        <label>m2 — 2 месяца оплат</label>
                         <input type="number" id="coef-m2" step="0.01" value="1.15" onchange="calculate()">
                     </div>
                     <div class="coef-item">
-                        <label>3-й мес → дотёк</label>
+                        <label>m3 — 3 месяца оплат</label>
                         <input type="number" id="coef-m3" step="0.01" value="1.08" onchange="calculate()">
                     </div>
                 </div>
@@ -542,7 +542,7 @@
                 <div class="input-cell">
                     <div class="label">
                         <span class="month-name">Месяц 1</span>
-                        <span class="coef-badge" id="badge-m1">×1.25</span>
+                        <span class="coef-badge" id="badge-m1">×1.08 (m3)</span>
                     </div>
                     <input type="number" id="revenue-m1" placeholder="Выручка" oninput="calculate()">
                     <div class="projected" id="proj-m1">→ 0 ₽</div>
@@ -550,7 +550,7 @@
                 <div class="input-cell">
                     <div class="label">
                         <span class="month-name">Месяц 2</span>
-                        <span class="coef-badge" id="badge-m2">×1.15</span>
+                        <span class="coef-badge" id="badge-m2">×1.15 (m2)</span>
                     </div>
                     <input type="number" id="revenue-m2" placeholder="Выручка" oninput="calculate()">
                     <div class="projected" id="proj-m2">→ 0 ₽</div>
@@ -558,7 +558,7 @@
                 <div class="input-cell">
                     <div class="label">
                         <span class="month-name">Месяц 3</span>
-                        <span class="coef-badge" id="badge-m3">×1.08</span>
+                        <span class="coef-badge" id="badge-m3">×1.25 (m1)</span>
                     </div>
                     <input type="number" id="revenue-m3" placeholder="Выручка" oninput="calculate()">
                     <div class="projected" id="proj-m3">→ 0 ₽</div>
@@ -859,11 +859,21 @@
                 quarterStartMonth + 2
             ];
             
+            const monthNames = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+            
+            // Обновляем названия месяцев в UI
+            document.querySelectorAll('.compact-grid .month-name')[0].textContent = monthNames[quarterStartMonth];
+            document.querySelectorAll('.compact-grid .month-name')[1].textContent = monthNames[quarterStartMonth + 1];
+            document.querySelectorAll('.compact-grid .month-name')[2].textContent = monthNames[quarterStartMonth + 2];
+            
             // Get coefficients
-            const coefM1 = parseFloat(document.getElementById('coef-m1').value) || 1.25;
-            const coefM2 = parseFloat(document.getElementById('coef-m2').value) || 1.15;
-            const coefM3 = parseFloat(document.getElementById('coef-m3').value) || 1.08;
-            const coefs = [coefM1, coefM2, coefM3];
+            const coefM1 = parseFloat(document.getElementById('coef-m1').value) || 1.25; // 1 месяц
+            const coefM2 = parseFloat(document.getElementById('coef-m2').value) || 1.15; // 2 месяца
+            const coefM3 = parseFloat(document.getElementById('coef-m3').value) || 1.08; // 3 месяца
+            
+            // Применяем коэффициенты в зависимости от количества месяцев с оплатами:
+            // Месяц 1 → m3 (3 месяца прошло), Месяц 2 → m2 (2 месяца), Месяц 3 → m1 (1 месяц)
+            const coefs = [coefM3, coefM2, coefM1];
 
             // Get revenue и expenses
             const revenues = [
@@ -967,6 +977,11 @@
             document.getElementById('revenue-total').value = baseTotalRev > 0 ? baseTotalRev : '';
             document.getElementById('expense-total').value = baseTotalExp > 0 ? baseTotalExp : '';
 
+            // Update badge values
+            document.getElementById('badge-m1').textContent = `×${coefM3.toFixed(2)} (m3)`;
+            document.getElementById('badge-m2').textContent = `×${coefM2.toFixed(2)} (m2)`;
+            document.getElementById('badge-m3').textContent = `×${coefM1.toFixed(2)} (m1)`;
+
             // Update results cards
             document.getElementById('res-current').textContent = formatMoney(totalRev);
             document.getElementById('res-projected').textContent = formatMoney(totalProj);
@@ -982,9 +997,10 @@
             document.getElementById('table-rev-m3').textContent = formatMoney(monthResults[2].revenue) + (monthResults[2].forecastRev > 0 ? ` + ${formatMoney(monthResults[2].forecastRev)}` : '');
             document.getElementById('table-rev-total').textContent = formatMoney(totalRev);
 
-            document.getElementById('table-coef-m1').textContent = `×${coefM1.toFixed(2)}`;
+            // m1 применяется к месяцу 3, m2 к месяцу 2, m3 к месяцу 1
+            document.getElementById('table-coef-m1').textContent = `×${coefM3.toFixed(2)}`;
             document.getElementById('table-coef-m2').textContent = `×${coefM2.toFixed(2)}`;
-            document.getElementById('table-coef-m3').textContent = `×${coefM3.toFixed(2)}`;
+            document.getElementById('table-coef-m3').textContent = `×${coefM1.toFixed(2)}`;
 
             document.getElementById('table-proj-m1').textContent = formatMoney(monthResults[0].projected);
             document.getElementById('table-proj-m2').textContent = formatMoney(monthResults[1].projected);

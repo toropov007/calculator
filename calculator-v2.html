@@ -609,9 +609,12 @@
         }
 
         function updateCoefBadges(coefs) {
-            document.getElementById('coef-badge-m1').textContent = `×${coefs.m1.toFixed(2)} (2 мес)`;
-            document.getElementById('coef-badge-m2').textContent = `×${coefs.m2.toFixed(2)} (1 мес)`;
-            document.getElementById('coef-badge-m3').textContent = `×${coefs.m3.toFixed(2)} (1 мес) + прогноз`;
+            // Месяц 1 (апрель+май) → m2 (2 месяца данных)
+            // Месяц 2 (май) → m1 (1 месяц данных)
+            // Месяц 3 (июнь) → m1 (1 месяц, но пока неполный)
+            document.getElementById('coef-badge-m1').textContent = `×${coefs.m2.toFixed(2)} (m2 — 2 мес)`;
+            document.getElementById('coef-badge-m2').textContent = `×${coefs.m1.toFixed(2)} (m1 — 1 мес)`;
+            document.getElementById('coef-badge-m3').textContent = `×${coefs.m1.toFixed(2)} (m1 — 1 мес) + прогноз`;
         }
 
         function updateFromDataDate() {
@@ -714,9 +717,9 @@
                 m3FullExp = expM3 + m3ForecastExp;
             }
             
-            const projM1 = revM1 * coefs.m1;
-            const projM2 = revM2 * coefs.m2;
-            const projM3 = m3FullRev * coefs.m3;
+            const projM1 = revM1 * coefs.m2;  // Месяц 1 → m2 (2 месяца данных)
+            const projM2 = revM2 * coefs.m1;  // Месяц 2 → m1 (1 месяц данных)
+            const projM3 = m3FullRev * coefs.m1;  // Месяц 3 → m1 (1 месяц)
             
             const totalCurrentRev = revM1 + revM2 + revM3;
             const totalProjectedRev = projM1 + projM2 + projM3;
@@ -734,28 +737,28 @@
             romiEl.className = 'result-value ' + (romi >= 0 ? 'positive' : 'negative');
             
             document.getElementById('m1-input').textContent = formatMoney(revM1);
-            document.getElementById('m1-coef-val').textContent = coefs.m1.toFixed(2);
+            document.getElementById('m1-coef-val').textContent = coefs.m2.toFixed(2);
             document.getElementById('m1-projected').textContent = formatMoney(projM1);
             document.getElementById('detail-rev-m1').textContent = formatMoney(revM1);
-            document.getElementById('detail-coef-m1').textContent = '×' + coefs.m1.toFixed(2);
+            document.getElementById('detail-coef-m1').textContent = '×' + coefs.m2.toFixed(2) + ' (m2)';
             document.getElementById('detail-proj-m1').textContent = formatMoney(projM1);
             document.getElementById('detail-exp-m1').textContent = formatMoney(expM1);
             
             document.getElementById('m2-input').textContent = formatMoney(revM2);
-            document.getElementById('m2-coef-val').textContent = coefs.m2.toFixed(2);
+            document.getElementById('m2-coef-val').textContent = coefs.m1.toFixed(2);
             document.getElementById('m2-projected').textContent = formatMoney(projM2);
             document.getElementById('detail-rev-m2').textContent = formatMoney(revM2);
-            document.getElementById('detail-coef-m2').textContent = '×' + coefs.m2.toFixed(2);
+            document.getElementById('detail-coef-m2').textContent = '×' + coefs.m1.toFixed(2) + ' (m1)';
             document.getElementById('detail-proj-m2').textContent = formatMoney(projM2);
             document.getElementById('detail-exp-m2').textContent = formatMoney(expM2);
             
             document.getElementById('m3-fact-rev').textContent = formatMoney(revM3);
             document.getElementById('m3-forecast-rev').textContent = '+' + formatMoney(m3ForecastRev);
             document.getElementById('m3-full-rev').textContent = formatMoney(m3FullRev);
-            document.getElementById('m3-coef-val').textContent = coefs.m3.toFixed(2);
+            document.getElementById('m3-coef-val').textContent = coefs.m1.toFixed(2);
             document.getElementById('m3-projected').textContent = formatMoney(projM3);
             document.getElementById('detail-rev-m3').textContent = formatMoney(revM3) + (m3ForecastRev > 0 ? ' + ' + formatMoney(m3ForecastRev) : '');
-            document.getElementById('detail-coef-m3').textContent = '×' + coefs.m3.toFixed(2);
+            document.getElementById('detail-coef-m3').textContent = '×' + coefs.m1.toFixed(2) + ' (m1)';
             document.getElementById('detail-proj-m3').textContent = formatMoney(projM3);
             document.getElementById('detail-exp-m3').textContent = formatMoney(m3FullExp);
             
