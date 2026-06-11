@@ -608,6 +608,11 @@
                 💡 Коэффициенты дотека показывают, во сколько раз увеличится выручка от лидов к концу квартала. 
                 Например, при коэффициенте 1.25 итоговая выручка составит 125% от текущей.
             </p>
+            <p class="info-text" style="background: #fff8e6; padding: 12px; border-radius: 6px; border-left: 3px solid var(--kontur-orange);">
+                ⚠️ <strong>Примечание:</strong> Для завершённых месяцев (апрель, май при дате в июне) показан <strong>итоговый дотёк</strong> 
+                на конец квартала. Фактически до конца квартала дотёк ещё продолжается, но калькулятор не корректирует 
+                коэффициенты пропорционально оставшемуся времени. Это консервативная оценка.
+            </p>
         </div>
 
         <!-- Forecast Section (shown when data date < quarter end) -->
@@ -756,17 +761,52 @@
             const remainingDays = totalDays - passedDays;
             const progress = Math.round((passedDays / totalDays) * 100);
             
-            // Update display
-            document.getElementById('current-quarter').textContent = `${year} ${quarterNames[quarter - 1]} квартал`;
-            document.getElementById('quarter-period').textContent = `${monthNames[quarterStartMonth]} — ${monthNames[quarterEndMonth]}`;
-            document.getElementById('quarter-progress').textContent = `${progress}% (${passedDays} дн)`;
-            document.getElementById('days-remaining').textContent = `осталось ${remainingDays} дн`;
+            // Update display (изначально от текущей даты)
+            updateQuarterDisplay(year, quarter, quarterNames, monthNames, quarterStartMonth, quarterEndMonth, totalDays, passedDays, remainingDays, progress);
             
             // Set default data date to today
             document.getElementById('data-date').valueAsDate = today;
             
             // Заполняем селектор продуктов из productCoefficients
             populateProductSelector();
+            
+            // Добавляем слушатель на изменение даты данных
+            document.getElementById('data-date').addEventListener('change', updateQuarterInfoFromDataDate);
+        }
+        
+        // Обновление инфо о квартале при изменении даты данных
+        function updateQuarterInfoFromDataDate() {
+            const dataDateInput = document.getElementById('data-date').value;
+            if (!dataDateInput) return;
+            
+            const dataDate = new Date(dataDateInput);
+            const year = dataDate.getFullYear();
+            const month = dataDate.getMonth();
+            
+            const quarter = Math.floor(month / 3) + 1;
+            const quarterStartMonth = (quarter - 1) * 3;
+            const quarterEndMonth = quarterStartMonth + 2;
+            
+            const quarterNames = ['I', 'II', 'III', 'IV'];
+            const monthNames = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+            
+            const quarterStart = new Date(year, quarterStartMonth, 1);
+            const quarterEnd = new Date(year, quarterEndMonth + 1, 0);
+            
+            const totalDays = Math.ceil((quarterEnd - quarterStart) / (1000 * 60 * 60 * 24)) + 1;
+            const passedDays = Math.ceil((dataDate - quarterStart) / (1000 * 60 * 60 * 24));
+            const remainingDays = totalDays - passedDays;
+            const progress = Math.round((passedDays / totalDays) * 100);
+            
+            updateQuarterDisplay(year, quarter, quarterNames, monthNames, quarterStartMonth, quarterEndMonth, totalDays, passedDays, remainingDays, progress);
+        }
+        
+        // Функция обновления отображения квартала
+        function updateQuarterDisplay(year, quarter, quarterNames, monthNames, quarterStartMonth, quarterEndMonth, totalDays, passedDays, remainingDays, progress) {
+            document.getElementById('current-quarter').textContent = `${year} ${quarterNames[quarter - 1]} квартал`;
+            document.getElementById('quarter-period').textContent = `${monthNames[quarterStartMonth]} — ${monthNames[quarterEndMonth]}`;
+            document.getElementById('quarter-progress').textContent = `${progress}% (${passedDays} дн)`;
+            document.getElementById('days-remaining').textContent = `осталось ${remainingDays} дн`;
         }
         
         // Функция заполнения селектора продуктов из productCoefficients
