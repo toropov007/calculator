@@ -538,7 +538,7 @@
         <div class="header">
             <div class="header-top">
                 <h1>📊 Калькулятор дотекающей выручки</h1>
-                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v4 · 2026-06-30 20:35</div>
+                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v5 · 2026-06-30 21:00</div>
                 <div class="product-selector">
                     <label for="product">Продукт:</label>
                     <select id="product" onchange="applyProductCoefficients(); calculate();">
@@ -690,14 +690,7 @@
             </div>
         </div>
 
-        <!-- Quarter Ended Warning (shown when data date >= quarter end) -->
-        <div class="quarter-ended-warning" id="quarter-ended-warning" style="display: none;">
-            <div class="warning-icon">⚠️</div>
-            <div class="warning-text">
-                <strong>Квартал завершён.</strong> Выручка внесена по конец квартала.
-                Прогноз дотекания отключён. Коэффициенты рассчитаны по факту остатка дотекания каждого месяца.
-            </div>
-        </div>
+        <!-- Quarter Ended Warning: убрано в v5 (когортный анализ сам учитывает дату) -->
 
         <!-- Results Section -->
         <div class="results-section">
@@ -1004,33 +997,48 @@
                     monthStatus = 'future';
                 }
 
-                // 2) Сколько месяцев осталось до leakDeadline
-                let monthsToDeadline = 0;
-                if (monthStatus === 'past') {
-                    monthsToDeadline = 0;
+                // 2) N = сколько полных месяцев, считая сам X, в когорте на dataDate.
+                //    Месяц M (>= X) входит в когорту, если dataDate >= 1-е число M.
+                //    Останавливаемся на первом месяце, который НЕ вошёл.
+                let N = 0;
+                for (let k = 0; k < 12; k++) {
+                    const firstOfM = new Date(year, monthIndex + k, 1);
+                    if (dataDate >= firstOfM) N++;
+                    else break;
+                }
+                // N=0: X ещё не наступил (или dataDate раньше 1-го X) — выручки нет
+                // N=1: X в процессе или только что закончился — грубый прогноз, m1
+                // N=2: X + следующий закрыт — m2
+                // N=3: X + два следующих закрыты — m3
+                // N>=4: всё дотёкло — 1.00
+
+                // 3) Коэффициент по N
+                let coefForMonth;
+                if (N === 0) {
+                    // месяц ещё не наступил — выручки нет, коэф не важен (вернём 1.00)
+                    coefForMonth = 1.00;
+                } else if (N === 1) {
+                    coefForMonth = coefM1;
+                } else if (N === 2) {
+                    coefForMonth = coefM2;
+                } else if (N === 3) {
+                    coefForMonth = coefM3;
                 } else {
-                    // разница в месяцах между (dataDate) и (leakDeadline)
-                    const y1 = dataDate.getFullYear(), m1d = dataDate.getMonth();
-                    const y2 = leakDeadline.getFullYear(), m2d = leakDeadline.getMonth();
-                    monthsToDeadline = (y2 - y1) * 12 + (m2d - m1d);
-                    if (monthsToDeadline < 0) monthsToDeadline = 0;
+                    coefForMonth = 1.00; // всё дотёкло
                 }
 
-                // 3) Маппинг на коэффициент
-                let coefForMonth;
-                if (monthsToDeadline === 0) coefForMonth = 1.00;
-                else if (monthsToDeadline === 1) coefForMonth = coefM1;
-                else if (monthsToDeadline === 2) coefForMonth = coefM2;
-                else coefForMonth = coefM3;
-
-                // 4) Метка «дотекает до ДД МММ» — последний день дотекания
+                // 4) Метка «дотекает до ДД МММ» — последний день дотекания (= leakDeadline - 1 день)
                 const lastLeakDay = new Date(leakDeadline.getTime() - 24*60*60*1000);
                 const dd = String(lastLeakDay.getDate()).padStart(2, '0');
                 const mm = monthNames[lastLeakDay.getMonth()];
-                // Запоминаем в массивы — используем ниже в UI
-                if (typeof monthCoefs === 'undefined') { window.monthCoefs = []; window.monthEndLabels = []; }
-                if (window.monthCoefs.length < 3) { window.monthCoefs.push(coefForMonth); window.monthEndLabels.push({text: `дотекает до ${dd} ${mm}`, status: monthStatus}); }
-                else { window.monthCoefs[i] = coefForMonth; window.monthEndLabels[i] = {text: `дотекает до ${dd} ${mm}`, status: monthStatus}; }
+                if (typeof window.monthCoefs === 'undefined') { window.monthCoefs = []; window.monthEndLabels = []; }
+                if (window.monthCoefs.length < 3) {
+                    window.monthCoefs.push(coefForMonth);
+                    window.monthEndLabels.push({ text: `дотекает до ${dd} ${mm}`, status: monthStatus, N: N });
+                } else {
+                    window.monthCoefs[i] = coefForMonth;
+                    window.monthEndLabels[i] = { text: `дотекает до ${dd} ${mm}`, status: monthStatus, N: N };
+                }
 
                 let daysPassedInMonth = 0;
                 let forecastRev = 0;
@@ -1152,10 +1160,10 @@
             updateForecastDisplay(totalForecastRev, totalForecastExp, totalForecastRev > 0);
 
             // Показываем плашку «квартал завершён» вместо forecast-section, если квартал кончился
+            // Плашку «квартал завершён» убрали в v5: в логике когортного анализа
+            // дата сама по себе определяет N и коэффициент — отдельная плашка не нужна.
             const warningEl = document.getElementById('quarter-ended-warning');
-            if (warningEl) {
-                warningEl.style.display = quarterEnded ? 'flex' : 'none';
-            }
+            if (warningEl) warningEl.style.display = 'none';
 
             // Сохраняем данные
             saveData();
