@@ -538,7 +538,7 @@
         <div class="header">
             <div class="header-top">
                 <h1>📊 Калькулятор дотекающей выручки</h1>
-                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v6.2 · 2026-06-30 21:55</div>
+                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v6.3 · 2026-06-30 21:58</div>
                 <div class="product-selector">
                     <label for="product">Продукт:</label>
                     <select id="product" onchange="applyProductCoefficients(); calculate();">
@@ -842,15 +842,9 @@
             
             // Заполняем селектор продуктов из productCoefficients
             populateProductSelector();
-            
-            // Загружаем сохранённые данные
-            loadSavedData();
-            
+
             // Добавляем слушатель на изменение даты данных
             document.getElementById('data-date').addEventListener('change', updateQuarterInfoFromDataDate);
-            
-            // Добавляем авто-сохранение при изменении полей
-            addAutoSaveListeners();
         }
         
         // Обновление инфо о квартале при изменении даты данных
@@ -1218,72 +1212,7 @@
             const warningEl = document.getElementById('quarter-ended-warning');
             if (warningEl) warningEl.style.display = 'none';
 
-            // Сохраняем данные
-            saveData();
-        }
-
-        // Сохранение данных в localStorage (data-date HE сохраняем — при каждой загрузке ставится «вчера»)
-        function saveData() {
-            const data = {
-                product: document.getElementById('product').value,
-                revenue: {
-                    m1: document.getElementById('revenue-m1').value,
-                    m2: document.getElementById('revenue-m2').value,
-                    m3: document.getElementById('revenue-m3').value
-                },
-                expense: {
-                    m1: document.getElementById('expense-m1').value,
-                    m2: document.getElementById('expense-m2').value,
-                    m3: document.getElementById('expense-m3').value
-                },
-                coef: {
-                    m1: document.getElementById('coef-m1').value,
-                    m2: document.getElementById('coef-m2').value,
-                    m3: document.getElementById('coef-m3').value
-                }
-            };
-            localStorage.setItem('konturCalculator_v1', JSON.stringify(data));
-        }
-
-        // Загрузка данных из localStorage
-        function loadSavedData() {
-            const saved = localStorage.getItem('konturCalculator_v1');
-            if (!saved) return;
-            
-            try {
-                const data = JSON.parse(saved);
-                
-                if (data.product) document.getElementById('product').value = data.product;
-                // data-date не подгружаем — всегда ставится «вчера» при загрузке страницы
-                if (data.revenue) {
-                    if (data.revenue.m1) document.getElementById('revenue-m1').value = data.revenue.m1;
-                    if (data.revenue.m2) document.getElementById('revenue-m2').value = data.revenue.m2;
-                    if (data.revenue.m3) document.getElementById('revenue-m3').value = data.revenue.m3;
-                }
-                if (data.expense) {
-                    if (data.expense.m1) document.getElementById('expense-m1').value = data.expense.m1;
-                    if (data.expense.m2) document.getElementById('expense-m2').value = data.expense.m2;
-                    if (data.expense.m3) document.getElementById('expense-m3').value = data.expense.m3;
-                }
-                if (data.coef) {
-                    if (data.coef.m1) document.getElementById('coef-m1').value = data.coef.m1;
-                    if (data.coef.m2) document.getElementById('coef-m2').value = data.coef.m2;
-                    if (data.coef.m3) document.getElementById('coef-m3').value = data.coef.m3;
-                }
-            } catch (e) {
-                console.log('Ошибка загрузки сохранённых данных', e);
-            }
-        }
-
-        // Добавление слушателей для авто-сохранения
-        function addAutoSaveListeners() {
-            const fields = ['revenue-m1', 'revenue-m2', 'revenue-m3', 'expense-m1', 'expense-m2', 'expense-m3', 'coef-m1', 'coef-m2', 'coef-m3'];
-            fields.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('change', saveData);
-            });
-            document.getElementById('product')?.addEventListener('change', saveData);
-        }
+            // localStorage убран в v6.3: каждый раз данные вводятся заново, никакого авто-сохранения.
 
         // Расчёт данных прогноза уже встроен в calculate()
         function calculateForecastData(currentRevenue, currentExpense) {
