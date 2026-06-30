@@ -538,7 +538,7 @@
         <div class="header">
             <div class="header-top">
                 <h1>📊 Калькулятор дотекающей выручки</h1>
-                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v6.4 · 2026-06-30 22:00</div>
+                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v6.5 · 2026-06-30 22:02</div>
                 <div class="product-selector">
                     <label for="product">Продукт:</label>
                     <select id="product" onchange="applyProductCoefficients(); calculate();">
@@ -942,12 +942,11 @@
                 if (ml.status === 'past') marker.classList.add('leaked');
                 else if (ml.status === 'current') marker.classList.add('current');
 
-                // Плейсхолдер полей ввода = та же подпись, чтобы было однозначно
-                const placeText = ml.text ? `по ${ml.text.replace('данные по ', '')}` : 'по дату';
+                // Плейсхолдеры — просто «Выручка» / «Расходы». Пояснение (по ДД.МММ) уже в подписи под названием месяца.
                 const rev = document.getElementById('revenue-m' + (i + 1));
-                if (rev) rev.placeholder = `Выручка (${placeText})`;
+                if (rev) rev.placeholder = 'Выручка';
                 const exp = document.getElementById('expense-m' + (i + 1));
-                if (exp) exp.placeholder = `Расходы (${placeText})`;
+                if (exp) exp.placeholder = 'Расходы';
             }
             
             // Get coefficients
