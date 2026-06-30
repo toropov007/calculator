@@ -5,41 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор прогноза выручки — Контур</title>
     <style>
-        /* Kontur-style CSS */
         :root {
-            --kontur-blue: #3072c4;
-            --kontur-blue-hover: #205090;
-            --kontur-green: #3a9b39;
-            --kontur-red: #d4351c;
-            --kontur-orange: #f18e20;
-            --kontur-gray-100: #f5f5f5;
-            --kontur-gray-200: #e6e6e6;
-            --kontur-gray-300: #cdcdcd;
-            --kontur-gray-500: #8b8b8b;
-            --kontur-gray-700: #4a4a4a;
-            --kontur-gray-900: #1a1a1a;
-            --kontur-border: #d9d9d9;
-            --kontur-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --blue: #3072c4;
+            --blue-dark: #205090;
+            --green: #3a9b39;
+            --red: #d4351c;
+            --orange: #f18e20;
+            --gray-100: #f5f5f5;
+            --gray-200: #e6e6e6;
+            --gray-300: #cdcdcd;
+            --gray-500: #8b8b8b;
+            --gray-700: #4a4a4a;
+            --gray-900: #1a1a1a;
+            --border: #d9d9d9;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
             background: #f5f6f8;
-            color: var(--kontur-gray-900);
+            color: var(--gray-900);
             line-height: 1.5;
             padding: 24px;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1200px; margin: 0 auto; }
 
         /* Header */
         .header {
@@ -47,360 +36,207 @@
             border-radius: 8px;
             padding: 24px 32px;
             margin-bottom: 16px;
-            box-shadow: var(--kontur-shadow);
+            box-shadow: var(--shadow);
         }
-
         .header-top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 12px;
             margin-bottom: 16px;
         }
-
+        h1 { font-size: 24px; font-weight: 600; }
         .version-badge {
             font-size: 11px;
-            color: var(--kontur-gray-500);
-            background: var(--kontur-gray-100);
-            border: 1px solid var(--kontur-gray-200);
+            color: var(--gray-500);
+            background: var(--gray-100);
+            border: 1px solid var(--gray-200);
             border-radius: 4px;
             padding: 2px 8px;
             font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-            letter-spacing: 0.02em;
         }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--kontur-gray-900);
-        }
-
-        /* Product selector */
-        .product-selector {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .product-selector label {
-            font-size: 14px;
-            color: var(--kontur-gray-700);
-        }
-
+        .product-selector { display: flex; align-items: center; gap: 8px; }
         .product-selector select {
-            padding: 8px 32px 8px 12px;
-            border: 1px solid var(--kontur-border);
+            padding: 6px 10px;
+            border: 1px solid var(--border);
             border-radius: 4px;
             font-size: 14px;
             background: white;
-            cursor: pointer;
             min-width: 200px;
         }
-
-        .product-selector select:focus {
-            outline: none;
-            border-color: var(--kontur-blue);
-        }
-
-        /* Quarter info */
         .quarter-info {
-            display: flex;
-            gap: 24px;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
             padding-top: 16px;
-            border-top: 1px solid var(--kontur-gray-200);
+            border-top: 1px solid var(--gray-200);
         }
-
-        .quarter-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
         .quarter-item label {
+            display: block;
             font-size: 12px;
-            color: var(--kontur-gray-500);
+            color: var(--gray-500);
+            margin-bottom: 4px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.05em;
         }
-
-        .quarter-item .value {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--kontur-gray-900);
-        }
-
-        .quarter-item .days-remaining {
-            font-size: 13px;
-            color: var(--kontur-gray-700);
-        }
-
-        /* Data date input */
+        .quarter-item .value { font-size: 16px; font-weight: 600; }
         .data-date-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--gray-200);
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid var(--kontur-gray-200);
         }
-
-        .data-date-section label {
-            font-size: 14px;
-            color: var(--kontur-gray-700);
-        }
-
-        .data-date-section input[type="date"] {
+        .data-date-section label { font-size: 14px; font-weight: 500; }
+        .data-date-section input {
             padding: 6px 10px;
-            border: 1px solid var(--kontur-border);
+            border: 1px solid var(--border);
             border-radius: 4px;
             font-size: 14px;
         }
 
-        .forecast-badge {
-            background: var(--kontur-blue);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        /* Compact input section */
-        .input-section {
+        /* Sections */
+        .section {
             background: white;
             border-radius: 8px;
             padding: 24px 32px;
             margin-bottom: 16px;
-            box-shadow: var(--kontur-shadow);
+            box-shadow: var(--shadow);
         }
-
         .section-title {
             font-size: 18px;
             font-weight: 600;
-            color: var(--kontur-gray-900);
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--kontur-blue);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--blue);
         }
 
-        /* Compact grid */
-        .compact-grid {
+        /* Coefficients */
+        .coef-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
         }
-
-        @media (max-width: 1024px) {
-            .compact-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 600px) {
-            .compact-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .input-cell {
-            background: var(--kontur-gray-100);
-            border-radius: 6px;
-            padding: 12px 16px;
-        }
-
-        .input-cell .label {
+        .coef-cell label {
+            display: block;
             font-size: 12px;
-            color: var(--kontur-gray-500);
-            margin-bottom: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            color: var(--gray-500);
+            margin-bottom: 4px;
         }
-
-        .input-cell .label .month-name {
-            color: var(--kontur-gray-700);
-            font-weight: 500;
-        }
-
-        /* «данные по ДД.МММ» — подпись под названием месяца: по какой день собирать выручку */
-        .month-end-marker {
-            font-size: 10px;
-            color: var(--kontur-gray-500);
-            margin-top: 2px;
-            font-weight: 400;
-            line-height: 1.2;
-        }
-        .month-end-marker.leaked {
-            color: var(--kontur-green);
-        }
-        .month-end-marker.current {
-            color: var(--kontur-orange);
-            font-weight: 600;
-        }
-
-        .input-cell .label .coef-badge {
-            background: var(--kontur-blue);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 10px;
-        }
-
-        .input-cell input {
+        .coef-cell input {
             width: 100%;
             padding: 8px 10px;
-            border: 1px solid var(--kontur-border);
+            border: 1px solid var(--border);
             border-radius: 4px;
             font-size: 14px;
-            transition: border-color 0.2s;
+        }
+        .info-text {
+            font-size: 13px;
+            color: var(--gray-500);
+            margin-top: 12px;
+            line-height: 1.5;
         }
 
-        .input-cell input:focus {
-            outline: none;
-            border-color: var(--kontur-blue);
+        /* Months grid */
+        .months-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
         }
-
-        .input-cell .projected {
-            font-size: 12px;
-            color: var(--kontur-green);
-            margin-top: 6px;
-            font-weight: 500;
+        @media (max-width: 800px) {
+            .months-grid { grid-template-columns: 1fr; }
         }
-
-        /* Coef settings */
-        .coef-settings {
-            background: #fff8e6;
-            border: 1px solid #ffe0b2;
+        .month-cell {
+            border: 1px solid var(--gray-200);
             border-radius: 6px;
             padding: 16px;
-            margin-bottom: 20px;
+            background: var(--gray-100);
         }
-
-        .coef-settings-title {
-            font-size: 14px;
+        .month-name {
+            font-size: 16px;
             font-weight: 600;
-            color: var(--kontur-orange);
-            margin-bottom: 12px;
+            margin-bottom: 2px;
         }
-
-        .coef-row {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .coef-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .coef-item label {
+        .month-hint {
             font-size: 12px;
-            color: var(--kontur-gray-500);
+            color: var(--orange);
+            margin-bottom: 4px;
+            font-weight: 500;
         }
-
-        .coef-item input {
-            width: 80px;
-            padding: 6px 8px;
-            border: 1px solid var(--kontur-border);
+        .month-hint.closed { color: var(--green); }
+        .month-hint.future { color: var(--gray-500); }
+        .month-coef {
+            font-size: 12px;
+            color: var(--blue);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        .field-label {
+            display: block;
+            font-size: 11px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            margin-top: 8px;
+            margin-bottom: 2px;
+            letter-spacing: 0.05em;
+        }
+        .month-cell input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
             border-radius: 4px;
             font-size: 14px;
-        }
-
-        /* Expense section */
-        .expense-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--kontur-gray-200);
-        }
-
-        .expense-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--kontur-gray-700);
-            margin-bottom: 12px;
-        }
-
-        /* Results section */
-        .results-section {
             background: white;
-            border-radius: 8px;
-            padding: 24px 32px;
-            box-shadow: var(--kontur-shadow);
         }
+        .month-cell input:focus {
+            outline: none;
+            border-color: var(--blue);
+        }
+        .month-result {
+            font-size: 12px;
+            color: var(--gray-700);
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        .month-result strong { color: var(--blue); }
 
-        .results-grid {
+        /* Total cards */
+        .total-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 16px;
-            margin-bottom: 24px;
         }
-
         @media (max-width: 900px) {
-            .results-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .total-grid { grid-template-columns: repeat(2, 1fr); }
         }
-
         @media (max-width: 500px) {
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
+            .total-grid { grid-template-columns: 1fr; }
         }
-
-        .result-card {
-            background: var(--kontur-gray-100);
+        .total-card {
             border-radius: 6px;
             padding: 20px;
             text-align: center;
         }
-
-        .result-card.highlight {
-            background: var(--kontur-blue);
-            color: white;
-        }
-
-        .result-card.highlight .result-label {
-            color: rgba(255,255,255,0.8);
-        }
-
-        .result-label {
+        .total-card.normal { background: var(--gray-100); }
+        .total-card.highlight { background: var(--blue); color: white; }
+        .total-card .label {
             font-size: 12px;
-            color: var(--kontur-gray-500);
-            margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            opacity: 0.8;
         }
-
-        .result-value {
-            font-size: 28px;
+        .total-card .value {
+            font-size: 24px;
             font-weight: 700;
-            color: var(--kontur-gray-900);
         }
-
-        .result-card.highlight .result-value {
-            color: white;
-        }
-
-        .result-value.positive {
-            color: var(--kontur-green);
-        }
-
-        .result-value.negative {
-            color: var(--kontur-red);
-        }
-
-        .result-card.highlight .result-value.positive {
-            color: #90ee90;
-        }
-
-        .result-card.highlight .result-value.negative {
-            color: #ffaaaa;
-        }
+        .total-card.highlight .value { color: white; }
+        .total-card .value.positive { color: var(--green); }
+        .total-card .value.negative { color: var(--red); }
+        .total-card.highlight .value.positive { color: #90ee90; }
+        .total-card.highlight .value.negative { color: #ff8a80; }
 
         /* Detail table */
         .detail-table {
@@ -408,832 +244,589 @@
             border-collapse: collapse;
             margin-top: 20px;
         }
-
         .detail-table th {
             text-align: left;
             padding: 12px;
             font-size: 12px;
-            color: var(--kontur-gray-500);
+            color: var(--gray-500);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid var(--kontur-gray-200);
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--gray-200);
         }
-
+        .detail-table th.num { text-align: right; }
         .detail-table td {
             padding: 12px;
-            border-bottom: 1px solid var(--kontur-gray-200);
+            border-bottom: 1px solid var(--gray-200);
             font-size: 14px;
         }
-
-        .detail-table .month-cell {
-            font-weight: 500;
-            color: var(--kontur-gray-700);
-        }
-
-        .detail-table .number {
+        .detail-table td.num {
             text-align: right;
             font-family: 'SF Mono', Monaco, monospace;
         }
-
-        .detail-table .projected-value {
-            color: var(--kontur-green);
-            font-weight: 600;
-        }
-
+        .detail-table .month-cell-label { font-weight: 500; color: var(--gray-700); }
+        .detail-table .projected-val { color: var(--blue); font-weight: 600; }
         .detail-table .total-row {
-            background: var(--kontur-gray-100);
+            background: var(--gray-100);
             font-weight: 600;
         }
-
-        .detail-table .total-row td {
-            border-bottom: none;
-        }
-
-        /* Info text */
-        .info-text {
-            font-size: 13px;
-            color: var(--kontur-gray-500);
-            margin-top: 16px;
-            line-height: 1.6;
-        }
-
-        /* Forecast section */
-        .forecast-section {
-            background: #e8f4fd;
-            border: 1px solid #b3d7f7;
-            border-radius: 6px;
-            padding: 16px;
-            margin-top: 20px;
-        }
-
-        .forecast-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--kontur-blue);
-            margin-bottom: 12px;
-        }
-
-        .forecast-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-
-        @media (max-width: 700px) {
-            .forecast-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .forecast-item {
-            background: white;
-            padding: 12px;
-            border-radius: 4px;
-        }
-
-        .forecast-item .label {
-            font-size: 11px;
-            color: var(--kontur-gray-500);
-            margin-bottom: 4px;
-        }
-
-        .forecast-item .value {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--kontur-gray-900);
-        }
-
-        /* Quarter ended warning */
-        .quarter-ended-warning {
-            background: #fff8e1;
-            border: 1px solid var(--kontur-orange);
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin-bottom: 16px;
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-            box-shadow: var(--kontur-shadow);
-        }
-
-        .quarter-ended-warning .warning-icon {
-            font-size: 24px;
-            flex-shrink: 0;
-        }
-
-        .quarter-ended-warning .warning-text {
-            font-size: 14px;
-            line-height: 1.5;
-            color: var(--kontur-gray-900);
-        }
-
-        .quarter-ended-warning .warning-text strong {
-            color: var(--kontur-orange);
-        }
+        .detail-table .total-row td { border-bottom: none; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header with Product Selector -->
-        <div class="header">
-            <div class="header-top">
-                <h1>📊 Калькулятор прогноза выручки</h1>
-                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v6.6 · 2026-06-30 22:05</div>
-                <div class="product-selector">
-                    <label for="product">Продукт:</label>
-                    <select id="product" onchange="applyProductCoefficients(); calculate();">
-                        <!-- Названия продуктов подтягиваются автоматически из productCoefficients -->
-                    </select>
-                </div>
-            </div>
-            
-            <div class="quarter-info">
-                <div class="quarter-item">
-                    <label>Текущий квартал</label>
-                    <span class="value" id="current-quarter">—</span>
-                </div>
-                <div class="quarter-item">
-                    <label>Период</label>
-                    <span class="value" id="quarter-period">—</span>
-                </div>
-                <div class="quarter-item">
-                    <label>Прогресс квартала</label>
-                    <span class="value" id="quarter-progress">—</span>
-                    <span class="days-remaining" id="days-remaining">—</span>
-                </div>
-            </div>
-            
-            <div class="data-date-section">
-                <label for="data-date">Данные актуальны на:</label>
-                <input type="date" id="data-date" onchange="calculate()">
-            </div>
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-top">
+            <h1>📊 Калькулятор прогноза выручки</h1>
+            <div class="version-badge">v8.1 · 2026-06-30</div>
         </div>
 
-        <!-- Compact Input Section -->
-        <div class="input-section">
-            <h2 class="section-title">⚙️ Параметры расчёта</h2>
-            
-            <!-- Coef Settings -->
-            <div class="coef-settings">
-                <div class="coef-settings-title">Коэффициенты прогноза (когортный анализ)</div>
-                <div class="coef-row">
-                    <div class="coef-item">
-                        <label>m1 — 1 месяц оплат</label>
-                        <input type="number" id="coef-m1" step="0.01" value="1.25" onchange="calculate()">
-                    </div>
-                    <div class="coef-item">
-                        <label>m2 — 2 месяца оплат</label>
-                        <input type="number" id="coef-m2" step="0.01" value="1.15" onchange="calculate()">
-                    </div>
-                    <div class="coef-item">
-                        <label>m3 — 3 месяца оплат</label>
-                        <input type="number" id="coef-m3" step="0.01" value="1.08" onchange="calculate()">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Revenue Inputs -->
-            <div class="compact-grid">
-                <div class="input-cell">
-                    <div class="label">
-                        <span class="month-name">Месяц 1</span>
-                        <span class="coef-badge" id="badge-m1">×1.08 (m3)</span>
-                    </div>
-                    <input type="number" id="revenue-m1" placeholder="Выручка (по 1 число след. мес)" oninput="calculate()">
-                    <div class="projected" id="proj-m1">→ 0 ₽</div>
-                </div>
-                <div class="input-cell">
-                    <div class="label">
-                        <span class="month-name">Месяц 2</span>
-                        <span class="coef-badge" id="badge-m2">×1.15 (m2)</span>
-                    </div>
-                    <input type="number" id="revenue-m2" placeholder="Выручка (по 1 число след. мес)" oninput="calculate()">
-                    <div class="projected" id="proj-m2">→ 0 ₽</div>
-                </div>
-                <div class="input-cell">
-                    <div class="label">
-                        <span class="month-name">Месяц 3</span>
-                        <span class="coef-badge" id="badge-m3">×1.25 (m1)</span>
-                    </div>
-                    <input type="number" id="revenue-m3" placeholder="Выручка (факт на текущую дату)" oninput="calculate()">
-                    <div class="projected" id="proj-m3">→ 0 ₽</div>
-                </div>
-                <div class="input-cell" style="background: #fff3e0;">
-                    <div class="label">
-                        <span class="month-name" style="color: var(--kontur-orange);">Итого выручка</span>
-                    </div>
-                    <input type="number" id="revenue-total" placeholder="Сумма" readonly style="background: #f5f5f5;">
-                    <div class="projected" id="proj-total" style="color: var(--kontur-orange); font-weight: 600;">→ 0 ₽</div>
-                </div>
-            </div>
-
-            <!-- Expense Inputs -->
-            <div class="expense-section">
-                <div class="expense-title">📢 Расходы на рекламу</div>
-                <div class="compact-grid">
-                    <div class="input-cell">
-                        <div class="label">
-                            <span class="month-name">Месяц 1</span>
-                        </div>
-                        <input type="number" id="expense-m1" placeholder="Расходы" oninput="calculate()">
-                    </div>
-                    <div class="input-cell">
-                        <div class="label">
-                            <span class="month-name">Месяц 2</span>
-                        </div>
-                        <input type="number" id="expense-m2" placeholder="Расходы" oninput="calculate()">
-                    </div>
-                    <div class="input-cell">
-                        <div class="label">
-                            <span class="month-name">Месяц 3</span>
-                        </div>
-                        <input type="number" id="expense-m3" placeholder="Расходы" oninput="calculate()">
-                    </div>
-                    <div class="input-cell" style="background: #ffebee;">
-                        <div class="label">
-                            <span class="month-name" style="color: var(--kontur-red);">Итого расходы</span>
-                        </div>
-                        <input type="number" id="expense-total" placeholder="Сумма" readonly style="background: #f5f5f5;">
-                        <div class="projected" style="color: var(--kontur-red); font-weight: 600;">ROMI зависит от этого</div>
-                    </div>
-                </div>
-            </div>
-
-            <p class="info-text">
-                💡 Коэффициенты прогноза показывают, во сколько раз увеличится выручка от лидов к концу квартала. 
-                Например, при коэффициенте 1.25 итоговая выручка составит 125% от текущей.
-            </p>
-            <p class="info-text" style="background: #fff8e6; padding: 12px; border-radius: 6px; border-left: 3px solid var(--kontur-orange);">
-                ⚠️ <strong>Примечание:</strong> Для завершённых месяцев (апрель, май при дате в июне) показан <strong>итоговый прогноз выручки</strong> 
-                на конец квартала. Фактически до конца квартала прогноз выручки ещё уточняется, но калькулятор не корректирует 
-                коэффициенты пропорционально оставшемуся времени. Это консервативная оценка.
-            </p>
+        <div class="product-selector">
+            <label for="product"><strong>Продукт:</strong></label>
+            <select id="product" onchange="onProductChange()">
+                <option value="">— выберите —</option>
+            </select>
         </div>
 
-        <!-- Forecast Section (shown when data date < quarter end) -->
-        <div class="forecast-section" id="forecast-section" style="display: none;">
-            <div class="forecast-title">📈 Прогноз до конца квартала</div>
-            <div class="forecast-grid">
-                <div class="forecast-item">
-                    <div class="label">Осталось дней</div>
-                    <div class="value" id="forecast-days">—</div>
-                </div>
-                <div class="forecast-item">
-                    <div class="label">Прогноз выручки (дневная)</div>
-                    <div class="value" id="forecast-revenue">—</div>
-                </div>
-                <div class="forecast-item">
-                    <div class="label">Прогноз расходов (дневной)</div>
-                    <div class="value" id="forecast-expense">—</div>
-                </div>
+        <div class="quarter-info">
+            <div class="quarter-item">
+                <label>Текущий квартал</label>
+                <span class="value" id="cur-quarter">—</span>
+            </div>
+            <div class="quarter-item">
+                <label>Период</label>
+                <span class="value" id="cur-period">—</span>
+            </div>
+            <div class="quarter-item">
+                <label>Прогресс</label>
+                <span class="value" id="cur-progress">—</span>
             </div>
         </div>
+        <div id="quarter-done-badge" style="display:none; margin-top:12px; padding:8px 16px; background:#e8f5e9; border:1px solid var(--green); border-radius:6px; font-size:14px; color:var(--green); font-weight:600;">
+            ✅ Квартал завершён — применяются финальные коэффициенты (m3/m2/m1)
+        </div>
 
-        <!-- Quarter Ended Warning: убрано в v5 (когортный анализ сам учитывает дату) -->
-
-        <!-- Results Section -->
-        <div class="results-section">
-            <h2 class="section-title" id="results-section-title">📋 Итоговые показатели</h2>
-            
-            <div class="results-grid">
-                <div class="result-card">
-                    <div class="result-label">Выручка (факт + прогноз)</div>
-                    <div class="result-value" id="res-current">0 ₽</div>
-                </div>
-                <div class="result-card highlight">
-                    <div class="result-label">Дотекающая выручка</div>
-                    <div class="result-value" id="res-projected">0 ₽</div>
-                </div>
-                <div class="result-card">
-                    <div class="result-label">Расходы (всего)</div>
-                    <div class="result-value" id="res-expense">0 ₽</div>
-                </div>
-                <div class="result-card highlight">
-                    <div class="result-label">ROMI (полный)</div>
-                    <div class="result-value" id="res-romi">0%</div>
-                </div>
-            </div>
-
-            <table class="detail-table">
-                <thead>
-                    <tr>
-                        <th>Месяц</th>
-                        <th class="number">Выручка</th>
-                        <th class="number">Коэф.</th>
-                        <th class="number">Прогноз выручки</th>
-                        <th class="number">Расходы</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="month-cell">Месяц 1</td>
-                        <td class="number" id="table-rev-m1">0 ₽</td>
-                        <td class="number" id="table-coef-m1">×1.25</td>
-                        <td class="number projected-value" id="table-proj-m1">0 ₽</td>
-                        <td class="number" id="table-exp-m1">0 ₽</td>
-                    </tr>
-                    <tr>
-                        <td class="month-cell">Месяц 2</td>
-                        <td class="number" id="table-rev-m2">0 ₽</td>
-                        <td class="number" id="table-coef-m2">×1.15</td>
-                        <td class="number projected-value" id="table-proj-m2">0 ₽</td>
-                        <td class="number" id="table-exp-m2">0 ₽</td>
-                    </tr>
-                    <tr>
-                        <td class="month-cell">Месяц 3</td>
-                        <td class="number" id="table-rev-m3">0 ₽</td>
-                        <td class="number" id="table-coef-m3">×1.08</td>
-                        <td class="number projected-value" id="table-proj-m3">0 ₽</td>
-                        <td class="number" id="table-exp-m3">0 ₽</td>
-                    </tr>
-                    <tr class="total-row">
-                        <td class="month-cell">ИТОГО</td>
-                        <td class="number" id="table-rev-total">0 ₽</td>
-                        <td class="number">—</td>
-                        <td class="number projected-value" id="table-proj-total">0 ₽</td>
-                        <td class="number" id="table-exp-total">0 ₽</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="data-date-section">
+            <label for="data-date"><strong>Данные актуальны на:</strong></label>
+            <input type="date" id="data-date" onchange="calculate()">
         </div>
     </div>
 
-    <script>
-        // === КОЭФФИЦИЕНТЫ ДОТЕКАНИЯ ПО ПРОДУКТАМ ===
-        
-        // Глобальные переменные для хранения прогноза
-        let forecastData = {
-            revenue: 0,
-            expense: 0,
-            daysRemaining: 0,
-            active: false
-        };
-        // Редактируйте эти значения под свои продукты
-        const productCoefficients = {
-            'product1': { m1: 2.20, m2: 1.32, m3: 1.08, name: 'КЭДО' },
-            'product2': { m1: 1.55, m2: 1.13, m3: 1.05, name: 'ТМФ' },
-            'product3': { m1: 1.75, m2: 1.21, m3: 1.10, name: 'Толк' },
-            'product4': { m1: 1.10, m2: 1.02, m3: 1.01, name: 'УЦ' },
-            'product5': { m1: 1.49, m2: 1.09, m3: 1.04, name: 'Маркет+ОФД' },
-            'product6': { m1: 1.42, m2: 1.16, m3: 1.06, name: 'Диадок' },
-            'product7': { m1: 2.83, m2: 1.55, m3: 1.26, name: 'Логистика' },
-            'product8': { m1: 1.95, m2: 1.37, m3: 1.10, name: 'EDI' },
-            'product9': { m1: 2.36, m2: 1.36, m3: 1.15, name: 'Маркировка' },
-            'product10': { m1: 1.74, m2: 1.13, m3: 1.03, name: 'Стрим' },
-            'product11': { m1: 1.44, m2: 1.15, m3: 1.06, name: 'Компас' },
-            'product12': { m1: 1.45, m2: 1.10, m3: 1.03, name: 'Закупки' },
-            'product13': { m1: 1.50, m2: 1.13, m3: 1.07, name: 'Бренд' },
-            'product14': { m1: 7.16, m2: 2.60, m3: 2.14, name: 'Эльба' },
-            'product15': { m1: 1.72, m2: 1.23, m3: 1.08, name: 'Отель' },
-            'product16': { m1: 1.59, m2: 1.09, m3: 1.01, name: 'ФМС' },
-            'product17': { m1: 1.28, m2: 1.09, m3: 1.07, name: 'Реестро' },
-            'product18': { m1: 1.76, m2: 1.39, m3: 1.18, name: 'ЭКП' },
-        };
-        
-        // Функция применения коэффициентов продукта
-        function applyProductCoefficients() {
-            const product = document.getElementById('product').value;
-            const coefs = productCoefficients[product];
-            
-            if (coefs) {
-                document.getElementById('coef-m1').value = coefs.m1.toFixed(2);
-                document.getElementById('coef-m2').value = coefs.m2.toFixed(2);
-                document.getElementById('coef-m3').value = coefs.m3.toFixed(2);
-            }
-        }
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            initQuarterInfo();
-            applyProductCoefficients();
-            calculate();
-        });
+    <!-- Coefficients -->
+    <div class="section">
+        <div class="section-title">⚙️ Коэффициенты прогноза</div>
+        <div class="coef-grid">
+            <div class="coef-cell">
+                <label>m1 — 1 месяц оплат</label>
+                <input type="number" id="coef-m1" step="0.01" value="1.25" onchange="calculate()">
+            </div>
+            <div class="coef-cell">
+                <label>m2 — 2 месяца оплат</label>
+                <input type="number" id="coef-m2" step="0.01" value="1.15" onchange="calculate()">
+            </div>
+            <div class="coef-cell">
+                <label>m3 — 3 месяца оплат</label>
+                <input type="number" id="coef-m3" step="0.01" value="1.08" onchange="calculate()">
+            </div>
+        </div>
+        <p class="info-text">
+            💡 Коэффициенты подставляются автоматически из выбранного продукта. Можно править вручную.
+        </p>
+    </div>
 
-        function initQuarterInfo() {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = today.getMonth(); // 0-11
-            
-            // Determine current quarter
-            const quarter = Math.floor(month / 3) + 1;
-            const quarterStartMonth = (quarter - 1) * 3;
-            const quarterEndMonth = quarterStartMonth + 2;
-            
-            const quarterNames = ['I', 'II', 'III', 'IV'];
-            const monthNames = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
-            
-            // Quarter start and end dates
-            const quarterStart = new Date(year, quarterStartMonth, 1);
-            const quarterEnd = new Date(year, quarterEndMonth + 1, 0); // Last day of last month
-            
-            // Days calculation
-            const totalDays = Math.ceil((quarterEnd - quarterStart) / (1000 * 60 * 60 * 24)) + 1;
-            const passedDays = Math.ceil((today - quarterStart) / (1000 * 60 * 60 * 24));
-            const remainingDays = totalDays - passedDays;
-            const progress = Math.round((passedDays / totalDays) * 100);
-            
-            // Update display (изначально от текущей даты)
-            updateQuarterDisplay(year, quarter, quarterNames, monthNames, quarterStartMonth, quarterEndMonth, totalDays, passedDays, remainingDays, progress);
-            
-            // Set default data date to YESTERDAY (last fully closed day of data)
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            document.getElementById('data-date').valueAsDate = yesterday;
-            
-            // Заполняем селектор продуктов из productCoefficients
-            populateProductSelector();
+    <!-- Revenue & Expenses input -->
+    <div class="section">
+        <div class="section-title">💰 Выручка и расходы по месяцам</div>
+        <div class="months-grid" id="months-grid">
+            <!-- Заполняется JS -->
+        </div>
+    </div>
 
-            // Добавляем слушатель на изменение даты данных
-            document.getElementById('data-date').addEventListener('change', updateQuarterInfoFromDataDate);
-        }
-        
-        // Обновление инфо о квартале при изменении даты данных
-        function updateQuarterInfoFromDataDate() {
-            const dataDateInput = document.getElementById('data-date').value;
-            if (!dataDateInput) return;
-            
-            const dataDate = new Date(dataDateInput);
-            const year = dataDate.getFullYear();
-            const month = dataDate.getMonth();
-            
-            const quarter = Math.floor(month / 3) + 1;
-            const quarterStartMonth = (quarter - 1) * 3;
-            const quarterEndMonth = quarterStartMonth + 2;
-            
-            const quarterNames = ['I', 'II', 'III', 'IV'];
-            const monthNames = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
-            
-            const quarterStart = new Date(year, quarterStartMonth, 1);
-            const quarterEnd = new Date(year, quarterEndMonth + 1, 0);
-            
-            const totalDays = Math.ceil((quarterEnd - quarterStart) / (1000 * 60 * 60 * 24)) + 1;
-            const passedDays = Math.ceil((dataDate - quarterStart) / (1000 * 60 * 60 * 24));
-            const remainingDays = totalDays - passedDays;
-            const progress = Math.round((passedDays / totalDays) * 100);
-            
-            updateQuarterDisplay(year, quarter, quarterNames, monthNames, quarterStartMonth, quarterEndMonth, totalDays, passedDays, remainingDays, progress);
-        }
-        
-        // Функция обновления отображения квартала
-        function updateQuarterDisplay(year, quarter, quarterNames, monthNames, quarterStartMonth, quarterEndMonth, totalDays, passedDays, remainingDays, progress) {
-            document.getElementById('current-quarter').textContent = `${year} ${quarterNames[quarter - 1]} квартал`;
-            document.getElementById('quarter-period').textContent = `${monthNames[quarterStartMonth]} — ${monthNames[quarterEndMonth]}`;
-            document.getElementById('quarter-progress').textContent = `${progress}% (${passedDays} дн)`;
-            document.getElementById('days-remaining').textContent = `осталось ${remainingDays} дн`;
-        }
-        
-        // Функция заполнения селектора продуктов из productCoefficients
-        function populateProductSelector() {
-            const select = document.getElementById('product');
-            select.innerHTML = ''; // Очищаем текущие опции
-            
-            Object.keys(productCoefficients).forEach(key => {
-                const product = productCoefficients[key];
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = product.name;
-                select.appendChild(option);
-            });
-        }
+    <!-- Total cards -->
+    <div class="section">
+        <div class="section-title">📋 Итоговые показатели</div>
+        <div class="total-grid">
+            <div class="total-card normal">
+                <div class="label">Выручка (факт + прогноз)</div>
+                <div class="value" id="total-revenue">0 ₽</div>
+            </div>
+            <div class="total-card highlight">
+                <div class="label">Прогноз выручки</div>
+                <div class="value" id="total-projected">0 ₽</div>
+            </div>
+            <div class="total-card normal">
+                <div class="label">Расходы (факт + прогноз)</div>
+                <div class="value" id="total-expense">0 ₽</div>
+            </div>
+            <div class="total-card highlight">
+                <div class="label">ROMI</div>
+                <div class="value" id="total-romi">0%</div>
+            </div>
+        </div>
 
-        function formatMoney(amount) {
-            return new Intl.NumberFormat('ru-RU').format(Math.round(amount)) + ' ₽';
-        }
+        <!-- Detail table -->
+        <table class="detail-table">
+            <thead>
+                <tr>
+                    <th>Месяц</th>
+                    <th class="num">Выручка (факт)</th>
+                    <th class="num">Прогноз доп.</th>
+                    <th class="num">Выручка (факт+прогноз)</th>
+                    <th class="num">Коэф.</th>
+                    <th class="num">Прогноз выручки</th>
+                    <th class="num">Расходы (факт+прогноз)</th>
+                </tr>
+            </thead>
+            <tbody id="detail-tbody">
+                <!-- Заполняется JS -->
+            </tbody>
+        </table>
+    </div>
 
-        function calculate() {
-            // Получаем дату актуальности данных
-            const dataDateInput = document.getElementById('data-date').value;
-            const dataDate = dataDateInput ? new Date(dataDateInput) : new Date();
-            
-            // Определяем текущий квартал и месяцы квартала
-            const year = dataDate.getFullYear();
-            const currentMonth = dataDate.getMonth(); // 0-11
-            const quarter = Math.floor(currentMonth / 3) + 1;
-            const quarterStartMonth = (quarter - 1) * 3;
-            
-            // Месяцы квартала: 0, 1, 2 (относительно начала квартала)
-            const monthsInQuarter = [
-                quarterStartMonth,
-                quarterStartMonth + 1,
-                quarterStartMonth + 2
-            ];
+</div>
 
-            // Последний день квартала
-            const quarterEnd = new Date(year, quarterStartMonth + 3, 0);
-            // Квартал завершён: dataDate == quarterEnd (последний день) или позже
-            const quarterEnded = dataDate >= quarterEnd;
+<script>
+'use strict';
 
-            const monthNames = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
-            
-            // Обновляем названия месяцев, метки «данные по ДД МММ» и плейсхолдеры в полях выручки/расходов
-            const monthNameEls = document.querySelectorAll('.compact-grid .month-name');
-            for (let i = 0; i < 3; i++) {
-                if (!monthNameEls[i]) continue;
-                monthNameEls[i].textContent = monthNames[monthsInQuarter[i]];
-                let marker = monthNameEls[i].parentElement.querySelector('.month-end-marker');
-                if (!marker) {
-                    marker = document.createElement('div');
-                    marker.className = 'month-end-marker';
-                    monthNameEls[i].parentElement.appendChild(marker);
-                }
-                const ml = (window.monthEndLabels && window.monthEndLabels[i]) || {text: '', status: 'future'};
-                marker.textContent = ml.text;
-                marker.classList.remove('leaked', 'current');
-                if (ml.status === 'past') marker.classList.add('leaked');
-                else if (ml.status === 'current') marker.classList.add('current');
+// ================================================================
+// ПРОДУКТЫ И КОЭФФИЦИЕНТЫ
+// ================================================================
+const PRODUCT_COEFFICIENTS = {
+    'kedo':        { m1: 2.20, m2: 1.32, m3: 1.08, name: 'КЭДО' },
+    'tmf':         { m1: 1.55, m2: 1.13, m3: 1.05, name: 'ТМФ' },
+    'talk':        { m1: 1.75, m2: 1.21, m3: 1.10, name: 'Толк' },
+    'uc':          { m1: 1.10, m2: 1.02, m3: 1.01, name: 'УЦ' },
+    'market_ofd':  { m1: 1.49, m2: 1.09, m3: 1.04, name: 'Маркет+ОФД' },
+    'diadoc':      { m1: 1.42, m2: 1.16, m3: 1.06, name: 'Диадок' },
+    'logistics':   { m1: 2.83, m2: 1.55, m3: 1.26, name: 'Логистика' },
+    'edi':         { m1: 1.95, m2: 1.37, m3: 1.10, name: 'EDI' },
+    'marking':     { m1: 2.36, m2: 1.36, m3: 1.15, name: 'Маркировка' },
+    'stream':      { m1: 1.74, m2: 1.13, m3: 1.03, name: 'Стрим' },
+    'compass':     { m1: 1.44, m2: 1.15, m3: 1.06, name: 'Компас' },
+    'zakupki':     { m1: 1.45, m2: 1.10, m3: 1.03, name: 'Закупки' },
+    'brand':       { m1: 1.50, m2: 1.13, m3: 1.07, name: 'Бренд' },
+    'elba':        { m1: 7.16, m2: 2.60, m3: 2.14, name: 'Эльба' },
+    'otel':        { m1: 1.72, m2: 1.23, m3: 1.08, name: 'Отель' },
+    'fms':         { m1: 1.59, m2: 1.09, m3: 1.01, name: 'ФМС' },
+    'reestro':     { m1: 1.28, m2: 1.09, m3: 1.07, name: 'Реестро' },
+    'ekp':         { m1: 1.76, m2: 1.39, m3: 1.18, name: 'ЭКП' },
+};
 
-                // Плейсхолдеры — просто «Выручка» / «Расходы». Пояснение (по ДД.МММ) уже в подписи под названием месяца.
-                const rev = document.getElementById('revenue-m' + (i + 1));
-                if (rev) rev.placeholder = 'Выручка';
-                const exp = document.getElementById('expense-m' + (i + 1));
-                if (exp) exp.placeholder = 'Расходы';
-            }
-            
-            // Get coefficients
-            const coefM1 = parseFloat(document.getElementById('coef-m1').value) || 1.25; // 1 месяц прогноза
-            const coefM2 = parseFloat(document.getElementById('coef-m2').value) || 1.15; // 2 месяца
-            const coefM3 = parseFloat(document.getElementById('coef-m3').value) || 1.08; // 3 месяца
+const MONTH_NAMES = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+const MONTH_NAMES_FULL = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+const QUARTER_NAMES = ['I', 'II', 'III', 'IV'];
 
-            // Для каждого месяца квартала считаем N — «сколько полных месяцев данных доступно» на dataDate.
-            // Правила:
-            //   - месяц завершился (dataDate >= 1-е число следующего) → данных N, см. правила ниже
-            //   - месяц в процессе (dataDate в [1-е, последнее]) → после прогноза = 1 месяц, coef = m1
-            //   - месяц ещё не наступил, до его 1-го осталось 1 месяц → coef = m2
-            //   - месяц ещё не наступил, до его 1-го осталось 2 месяца → coef = m3
-            // Метка «по ДД МММ» = последний день, по который собирать данные.
+// ================================================================
+// УТИЛИТЫ
+// ================================================================
 
-            // Get revenue и expenses
-            const revenues = [
-                parseFloat(document.getElementById('revenue-m1').value) || 0,
-                parseFloat(document.getElementById('revenue-m2').value) || 0,
-                parseFloat(document.getElementById('revenue-m3').value) || 0
-            ];
-            const expenses = [
-                parseFloat(document.getElementById('expense-m1').value) || 0,
-                parseFloat(document.getElementById('expense-m2').value) || 0,
-                parseFloat(document.getElementById('expense-m3').value) || 0
-            ];
+function parseLocalDate(str) {
+    if (!str) return null;
+    const parts = str.split('-').map(Number);
+    if (parts.length !== 3 || parts.some(isNaN)) return null;
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+}
 
-            // Для каждого месяца считаем: факт + прогноз (если месяц не закончился)
-            const monthResults = [];
-            let baseTotalRev = 0;
-            let baseTotalProj = 0;
-            let baseTotalExp = 0;
-            
-            for (let i = 0; i < 3; i++) {
-                const monthIndex = monthsInQuarter[i];
-                const monthStart = new Date(year, monthIndex, 1);
-                const monthEnd = new Date(year, monthIndex + 1, 0); // Последний день месяца
-                const daysInMonth = monthEnd.getDate();
-                // Граница = 1-е число СЛЕДУЮЩЕГО месяца (после этого данные за X считаются закрытыми)
-                const leakDeadline = new Date(year, monthIndex + 1, 1);
+function formatMoney(amount) {
+    if (!isFinite(amount)) amount = 0;
+    return new Intl.NumberFormat('ru-RU').format(Math.round(amount)) + ' ₽';
+}
 
-                // 1) Статус месяца относительно dataDate
-                let monthStatus; // 'past' | 'current' | 'future'
-                if (dataDate >= leakDeadline) {
-                    monthStatus = 'past';
-                } else if (dataDate >= monthStart) {
-                    monthStatus = 'current';
-                } else {
-                    monthStatus = 'future';
-                }
+function lastDayOfMonth(year, monthIndex) {
+    return new Date(year, monthIndex + 1, 0).getDate();
+}
 
-                // 2) N = сколько полных месяцев данных по X (последний день месяца ≤ dataDate).
-                //    Подпись = "по ДД МММ" = "по какой день собирать выручку, чтобы получить текущий коэф".
-                //    Логика:
-                //      N=0 (X ещё не наступил): выручки нет, подпись = "по 1-е X"
-                //      N=1 (1 месяц данных):     подпись = по последний день X
-                //      N=2 (2 месяца данных):    подпись = по последний день X+1
-                //      N=3 (3 месяца данных):    подпись = по последний день X+2
-                //      N>=4: данных за 4+ месяцев, подпись = по dataDate
-                //    Пример для 15.06.2026 (Q2):
-                //      Апр: N=2 (30.04, 31.05 ≤ 15.06) → подпись "по 31 мая" (конец X+1), коэф m2
-                //      Май: N=1 (только 31.05) → подпись "по 31 мая" (конец X), коэф m1
-                //      Июнь: N=0 → подпись "по 1 июня", коэф m1 (грубый)
-                //    Пример для 30.06.2026:
-                //      Апр: N=3 (30.04, 31.05, 30.06) → "по 30 июня" (конец X+2), m3
-                //      Май: N=2 → "по 30 июня" (конец X+1), m2
-                //      Июнь: N=1 → "по 30 июня" (конец X), m1
-                let N = 0;
-                for (let k = 0; k < 12; k++) {
-                    const lastDay = new Date(year, monthIndex + k + 1, 0);
-                    if (dataDate >= lastDay) N++;
-                    else break;
-                }
+// ================================================================
+// КОГОРТНЫЙ АНАЛИЗ: N и коэффициент для месяца X
+// ================================================================
 
-                // Дата подписи:
-                //   если X в процессе (monthStatus === 'current' → dataDate между 1-м X и 1-м X+1):
-                //     подпись = "по dataDate" (столько данных уже есть)
-                //   если X ещё не наступил (N=0 и monthStatus === 'future'):
-                //     подпись = "по 1-е X" (данных нет)
-                //   если X закрыт:
-                //     подпись = по последний день X+(N-1)
-                //   N>=4: подпись = по dataDate
-                let labelDate;
-                if (monthStatus === 'current') {
-                    labelDate = dataDate;
-                } else if (N === 0) {
-                    labelDate = new Date(year, monthIndex, 1);
-                } else if (N >= 4) {
-                    labelDate = dataDate;
-                } else {
-                    labelDate = new Date(year, monthIndex + N, 0);
-                }
-                const dd = String(labelDate.getDate()).padStart(2, '0');
-                const mm = monthNames[labelDate.getMonth()];
-                // N=0: X ещё не наступил (или dataDate раньше 1-го X) — выручки нет
-                // N=1: X в процессе или только что закончился — грубый прогноз, m1
-                // N=2: X + следующий закрыт — m2
-                // N=3: X + два следующих закрыты — m3
-                // N>=4: coef = 1.00
+/**
+ * Для месяца X (индекс 0-11) и даты dataDate:
+ *   N = сколько полных месяцев данных (считая 1-е числа следующих месяцев, прошедших к dataDate)
+ *   coef = m1/m2/m3/1.0 в зависимости от N и статуса
+ *   status = 'past' | 'current' | 'future'
+ *   hintText = подпись "по ДД.МММ"
+ */
+function computeMonthMeta(X, dataDate, year, m1, m2, m3, quarterStartMonth) {
+    const monthStart = new Date(year, X, 1);
+    const monthEnd = new Date(year, X + 1, 0);
+    const leakDeadline = new Date(year, X + 1, 1);
 
-                // 3) Коэффициент по N + monthStatus
-                //   current (месяц в процессе): после докидывания прогноза получаем «1 месяц данных» → всегда m1
-                //   N=0 future (месяц ещё не наступил): выручки нет, коэф не важен
-                //   N=1, 2, 3 — берём m1 / m2 / m3
-                //   N>=4: данных за 4+ месяцев
-                let coefForMonth;
-                if (monthStatus === 'future') {
-                    coefForMonth = 1.00; // выручки нет
-                } else if (monthStatus === 'current') {
-                    coefForMonth = coefM1; // в процессе: всегда m1
-                } else if (N === 1) {
-                    coefForMonth = coefM1;
-                } else if (N === 2) {
-                    coefForMonth = coefM2;
-                } else if (N === 3) {
-                    coefForMonth = coefM3;
-                } else {
-                    coefForMonth = 1.00; // данных достаточно (N>=4)
-                }
+    // Последний день квартала
+    const quarterLastDay = new Date(year, quarterStartMonth + 3, 0);
+    const isQuarterLastDay = dataDate.getFullYear() === year &&
+        dataDate.getMonth() === quarterLastDay.getMonth() &&
+        dataDate.getDate() === quarterLastDay.getDate();
 
-                // 4) Подпись «по ДД МММ» — по какой день собирать выручку
-                if (typeof window.monthCoefs === 'undefined') { window.monthCoefs = []; window.monthEndLabels = []; }
-                if (window.monthCoefs.length < 3) {
-                    window.monthCoefs.push(coefForMonth);
-                    window.monthEndLabels.push({ text: `данные по ${dd} ${mm}`, status: monthStatus, N: N });
-                } else {
-                    window.monthCoefs[i] = coefForMonth;
-                    window.monthEndLabels[i] = { text: `данные по ${dd} ${mm}`, status: monthStatus, N: N };
-                }
+    // Статус месяца
+    let status;
+    if (dataDate >= leakDeadline) status = 'past';
+    else if (dataDate >= monthStart) status = 'current';
+    else status = 'future';
 
-                let daysPassedInMonth = 0;
-                let forecastRev = 0;
-                let forecastExp = 0;
-                let fullMonthRev = revenues[i];
-                let fullMonthExp = expenses[i];
+    // N: сколько 1-х чисел следующих месяцев ПРОШЛО к dataDate (считая сам X)
+    let N = 0;
+    for (let k = 1; k <= 3; k++) {
+        const firstOfNext = new Date(year, X + k, 1);
+        if (dataDate >= firstOfNext) N++;
+        else break;
+    }
+    if (status === 'current') N = 1;
 
-                if (monthStatus === 'current' && !quarterEnded) {
-                    // Месяц X в процессе. Среднедневная = (выручка за все предыдущие закрытые месяцы квартала + выручка за X по dataDate) /
-                    //                                  (дни этих предыдущих месяцев + dataDate.getDate())
-                    // Прогноз на оставшиеся дни X = среднедневная * (daysInMonth - dataDate.getDate()).
-                    let kohortRev = 0;
-                    let kohortExp = 0;
-                    let kohortDays = 0;
-                    // 1) предыдущие месяцы квартала, которые закрыты (lastDay ≤ dataDate)
-                    for (let p = 0; p < i; p++) {
-                        const pMonthIdx = monthsInQuarter[p];
-                        const pEnd = new Date(year, pMonthIdx + 1, 0);
-                        if (dataDate >= pEnd) {
-                            kohortRev += revenues[p];
-                            kohortExp += expenses[p];
-                            kohortDays += pEnd.getDate();
-                        }
-                    }
-                    // 2) сам X (по dataDate)
-                    kohortRev += revenues[i];
-                    kohortExp += expenses[i];
-                    kohortDays += dataDate.getDate();
+    // === СПЕЦПРАВИЛО: последний день квартала ===
+    // Все данные собраны по последний день квартала.
+    // Месяц 1 (первый в квартале) → m3 (3 месяца данных)
+    // Месяц 2 (второй) → m2 (2 месяца данных)
+    // Месяц 3 (третий) → m1 (1 месяц данных)
+    let coef;
+    let hintText;
+    let hintDate;
 
-                    const daysRemaining = daysInMonth - dataDate.getDate();
-                    if (kohortDays > 0 && daysRemaining > 0) {
-                        const dailyRev = kohortRev / kohortDays;
-                        const dailyExp = kohortExp / kohortDays;
-                        forecastRev = dailyRev * daysRemaining;
-                        forecastExp = dailyExp * daysRemaining;
-                    }
-                    daysPassedInMonth = dataDate.getDate();
-                    fullMonthRev = revenues[i] + forecastRev;
-                    fullMonthExp = expenses[i] + forecastExp;
-                } else if (monthStatus === 'past') {
-                    // Месяц закрыт — берём факт как есть
-                    fullMonthRev = revenues[i];
-                    fullMonthExp = expenses[i];
-                } else {
-                    // monthStatus === 'future' — месяц ещё не наступил
-                    fullMonthRev = 0;
-                    fullMonthExp = 0;
-                }
+    if (isQuarterLastDay) {
+        const monthIndexInQuarter = X - quarterStartMonth; // 0, 1, 2
+        if (monthIndexInQuarter === 0) coef = m3;
+        else if (monthIndexInQuarter === 1) coef = m2;
+        else coef = m1;
 
-                // Прогноз выручки = полная выручка месяца × коэффициент
-                const projected = fullMonthRev * coefForMonth;
-                
-                monthResults.push({
-                    revenue: revenues[i],
-                    expense: expenses[i],
-                    forecastRev: forecastRev,
-                    forecastExp: forecastExp,
-                    fullRev: fullMonthRev,
-                    fullExp: fullMonthExp,
-                    projected: projected,
-                    coef: coefForMonth
-                });
+        // Все подписи = по последний день квартала
+        hintDate = quarterLastDay;
+        const dd = String(hintDate.getDate()).padStart(2, '0');
+        const mm = MONTH_NAMES[hintDate.getMonth()];
+        hintText = `по ${dd} ${mm}`;
 
-                baseTotalRev += revenues[i];
-                baseTotalProj += revenues[i] * coefForMonth; // Прогноз выручки от факта
-                baseTotalExp += expenses[i];
-            }
-            
-            // Общий прогноз (сумма прогнозов по месяцам)
-            const totalForecastRev = monthResults.reduce((sum, m) => sum + m.forecastRev, 0);
-            const totalForecastExp = monthResults.reduce((sum, m) => sum + m.forecastExp, 0);
-            
-            // Полные итоги с учётом прогноза
-            const totalRev = baseTotalRev + totalForecastRev;
-            // Прогноз выручки считается от ПОЛНОЙ выручки (факт + прогноз)
-            const totalProj = monthResults.reduce((sum, m) => sum + m.projected, 0);
-            const totalExp = baseTotalExp + totalForecastExp;
-            
-            // ROMI
-            const romi = totalExp > 0 ? ((totalProj - totalExp) / totalExp * 100) : 0;
+        // N для отображения (не используется в расчёте, но для консистентности)
+        if (monthIndexInQuarter === 0) N = 3;
+        else if (monthIndexInQuarter === 1) N = 2;
+        else N = 1;
 
-            // Update coef badges
-            document.getElementById('badge-m1').textContent = `×${coefM1.toFixed(2)}`;
-            document.getElementById('badge-m2').textContent = `×${coefM2.toFixed(2)}`;
-            document.getElementById('badge-m3').textContent = `×${coefM3.toFixed(2)}`;
-
-            // Update projected previews (прогноз от ПОЛНОЙ выручки)
-            document.getElementById('proj-m1').textContent = `→ ${formatMoney(monthResults[0].projected)} (всего мес)`;
-            document.getElementById('proj-m2').textContent = `→ ${formatMoney(monthResults[1].projected)} (всего мес)`;
-            document.getElementById('proj-m3').textContent = `→ ${formatMoney(monthResults[2].projected)} (всего мес)`;
-            document.getElementById('proj-total').textContent = `→ ${formatMoney(totalProj)}`;
-
-            // Update total inputs
-            document.getElementById('revenue-total').value = baseTotalRev > 0 ? baseTotalRev : '';
-            document.getElementById('expense-total').value = baseTotalExp > 0 ? baseTotalExp : '';
-
-            // Update badge values (актуальные коэфы для каждого месяца квартала на текущую дату)
-            document.getElementById('badge-m1').textContent = `×${monthResults[0].coef.toFixed(2)}`;
-            document.getElementById('badge-m2').textContent = `×${monthResults[1].coef.toFixed(2)}`;
-            document.getElementById('badge-m3').textContent = `×${monthResults[2].coef.toFixed(2)}`;
-
-            // Update results cards
-            const productName = productCoefficients[product].name;
-            document.getElementById('results-section-title').textContent = `📋 Итоговые показатели — ${productName}`;
-            document.getElementById('res-current').textContent = formatMoney(totalRev);
-            document.getElementById('res-projected').textContent = formatMoney(totalProj);
-            document.getElementById('res-expense').textContent = formatMoney(totalExp);
-            
-            const romiEl = document.getElementById('res-romi');
-            romiEl.textContent = romi.toFixed(1) + '%';
-            romiEl.className = 'result-value ' + (romi >= 0 ? 'positive' : 'negative');
-
-            // Update detail table
-            document.getElementById('table-rev-m1').textContent = formatMoney(monthResults[0].revenue) + (monthResults[0].forecastRev > 0 ? ` + ${formatMoney(monthResults[0].forecastRev)}` : '');
-            document.getElementById('table-rev-m2').textContent = formatMoney(monthResults[1].revenue) + (monthResults[1].forecastRev > 0 ? ` + ${formatMoney(monthResults[1].forecastRev)}` : '');
-            document.getElementById('table-rev-m3').textContent = formatMoney(monthResults[2].revenue) + (monthResults[2].forecastRev > 0 ? ` + ${formatMoney(monthResults[2].forecastRev)}` : '');
-            document.getElementById('table-rev-total').textContent = formatMoney(totalRev);
-
-            // коэфы для каждого месяца квартала на текущую дату
-            document.getElementById('table-coef-m1').textContent = `×${monthResults[0].coef.toFixed(2)}`;
-            document.getElementById('table-coef-m2').textContent = `×${monthResults[1].coef.toFixed(2)}`;
-            document.getElementById('table-coef-m3').textContent = `×${monthResults[2].coef.toFixed(2)}`;
-
-            document.getElementById('table-proj-m1').textContent = formatMoney(monthResults[0].projected);
-            document.getElementById('table-proj-m2').textContent = formatMoney(monthResults[1].projected);
-            document.getElementById('table-proj-m3').textContent = formatMoney(monthResults[2].projected);
-            document.getElementById('table-proj-total').textContent = formatMoney(totalProj);
-
-            document.getElementById('table-exp-m1').textContent = formatMoney(monthResults[0].fullExp);
-            document.getElementById('table-exp-m2').textContent = formatMoney(monthResults[1].fullExp);
-            document.getElementById('table-exp-m3').textContent = formatMoney(monthResults[2].fullExp);
-            document.getElementById('table-exp-total').textContent = formatMoney(totalExp);
-
-            // Update forecast display
-            updateForecastDisplay(totalForecastRev, totalForecastExp, totalForecastRev > 0);
-
-            // Показываем плашку «квартал завершён» вместо forecast-section, если квартал кончился
-            // Плашку «квартал завершён» убрали в v5: в логике когортного анализа
-            // дата сама по себе определяет N и коэффициент — отдельная плашка не нужна.
-            const warningEl = document.getElementById('quarter-ended-warning');
-            if (warningEl) warningEl.style.display = 'none';
-
-            // localStorage убран в v6.3: каждый раз данные вводятся заново, никакого авто-сохранения.
-
-        // Расчёт данных прогноза уже встроен в calculate()
-        function calculateForecastData(currentRevenue, currentExpense) {
-            // Устарело, оставлено для совместимости
+        // Все месяцы считаем «past» — квартал завершён
+        status = 'past';
+    } else {
+        // Обычная логика
+        if (status === 'future') {
+            coef = 1.0;
+        } else if (status === 'current') {
+            coef = m1;
+        } else if (N === 1) {
+            coef = m1;
+        } else if (N === 2) {
+            coef = m2;
+        } else if (N >= 3) {
+            coef = m3;
+        } else {
+            coef = 1.0;
         }
 
-        // Отображение прогноза
-        function updateForecastDisplay(forecastRev, forecastExp, isActive) {
-            const forecastSection = document.getElementById('forecast-section');
-            if (isActive && forecastRev > 0) {
-                forecastSection.style.display = 'block';
+        // Подпись
+        if (status === 'future') {
+            hintDate = new Date(year, X, 1);
+        } else if (status === 'current') {
+            hintDate = dataDate;
+        } else {
+            hintDate = new Date(year, X + N, 0);
+        }
+        const dd = String(hintDate.getDate()).padStart(2, '0');
+        const mm = MONTH_NAMES[hintDate.getMonth()];
+        hintText = `по ${dd} ${mm}`;
+    }
+
+    return { N, coef, status, hintText, isQuarterLastDay };
+}
+
+// ================================================================
+// ПРОГНОЗ НА ОСТАТОК МЕСЯЦА (когда X в процессе)
+// ================================================================
+
+/**
+ * Среднедневная = (выручка за предыдущие закрытые месяцы квартала + выручка за X по dataDate)
+ *                 / (дни предыдущих закрытых + dataDate.getDate())
+ * Прогноз на остаток = среднедневная × (daysInX - dataDate.getDate())
+ */
+function computeForecastForCurrent(X, dataDate, year, quarterStartMonth, revenues, expenses) {
+    let kohortRev = 0, kohortExp = 0, kohortDays = 0;
+
+    for (let p = quarterStartMonth; p < X; p++) {
+        const pEnd = new Date(year, p + 1, 0);
+        if (dataDate >= pEnd) {
+            const revIdx = p - quarterStartMonth;
+            kohortRev += revenues[revIdx];
+            kohortExp += expenses[revIdx];
+            kohortDays += pEnd.getDate();
+        }
+    }
+
+    const xIdx = X - quarterStartMonth;
+    kohortRev += revenues[xIdx];
+    kohortExp += expenses[xIdx];
+    kohortDays += dataDate.getDate();
+
+    const daysInX = lastDayOfMonth(year, X);
+    const daysRemaining = daysInX - dataDate.getDate();
+
+    let forecastRev = 0, forecastExp = 0;
+    if (kohortDays > 0 && daysRemaining > 0) {
+        forecastRev = (kohortRev / kohortDays) * daysRemaining;
+        forecastExp = (kohortExp / kohortDays) * daysRemaining;
+    }
+
+    return {
+        fullRev: revenues[xIdx] + forecastRev,
+        fullExp: expenses[xIdx] + forecastExp,
+        forecastRev,
+        forecastExp,
+    };
+}
+
+// ================================================================
+// РЕНДЕР ЯЧЕЕК МЕСЯЦЕВ
+// ================================================================
+
+function renderMonthsGrid(quarterStartMonth) {
+    const grid = document.getElementById('months-grid');
+    grid.innerHTML = '';
+    for (let i = 0; i < 3; i++) {
+        const X = quarterStartMonth + i;
+        const monthFullName = MONTH_NAMES_FULL[X];
+
+        const cell = document.createElement('div');
+        cell.className = 'month-cell';
+        cell.innerHTML = `
+            <div class="month-name">${monthFullName}</div>
+            <div class="month-hint" id="hint-${i}">—</div>
+            <div class="month-coef" id="coef-${i}">—</div>
+
+            <label class="field-label">Выручка</label>
+            <input type="number" id="rev-${i}" placeholder="0" oninput="calculate()">
+
+            <label class="field-label">Расходы</label>
+            <input type="number" id="exp-${i}" placeholder="0" oninput="calculate()">
+
+            <div class="month-result" id="result-${i}">—</div>
+        `;
+        grid.appendChild(cell);
+    }
+}
+
+// ================================================================
+// ГЛАВНЫЙ РАСЧЁТ
+// ================================================================
+
+function calculate() {
+    const dataDateInput = document.getElementById('data-date').value;
+    const dataDate = parseLocalDate(dataDateInput);
+    if (!dataDate) return;
+
+    const year = dataDate.getFullYear();
+    const month = dataDate.getMonth();
+    const quarter = Math.floor(month / 3) + 1;
+    const quarterStartMonth = (quarter - 1) * 3;
+    const quarterEndMonth = quarterStartMonth + 2;
+
+    const m1 = parseFloat(document.getElementById('coef-m1').value) || 1.0;
+    const m2 = parseFloat(document.getElementById('coef-m2').value) || 1.0;
+    const m3 = parseFloat(document.getElementById('coef-m3').value) || 1.0;
+
+    // Считываем выручку/расходы
+    const revenues = [0, 0, 0], expenses = [0, 0, 0];
+    for (let i = 0; i < 3; i++) {
+        const r = parseFloat(document.getElementById(`rev-${i}`)?.value);
+        const e = parseFloat(document.getElementById(`exp-${i}`)?.value);
+        if (isFinite(r)) revenues[i] = r;
+        if (isFinite(e)) expenses[i] = e;
+    }
+
+    // Обновляем инфо о квартале
+    const quarterStart = new Date(year, quarterStartMonth, 1);
+    const quarterEnd = new Date(year, quarterEndMonth + 1, 0);
+    const totalDays = Math.round((quarterEnd - quarterStart) / 86400000) + 1;
+    const passedDays = Math.round((dataDate - quarterStart) / 86400000) + 1;
+    const progress = Math.round((passedDays / totalDays) * 100);
+    document.getElementById('cur-quarter').textContent = `${year} ${QUARTER_NAMES[quarter - 1]} квартал`;
+    document.getElementById('cur-period').textContent = `${MONTH_NAMES[quarterStartMonth]} — ${MONTH_NAMES[quarterEndMonth]}`;
+    document.getElementById('cur-progress').textContent = `${progress}% (${passedDays} из ${totalDays} дн)`;
+
+    // Плашка «Квартал завершён»
+    const quarterLastDay = new Date(year, quarterStartMonth + 3, 0);
+    const isQuarterLastDay = dataDate.getFullYear() === year &&
+        dataDate.getMonth() === quarterLastDay.getMonth() &&
+        dataDate.getDate() === quarterLastDay.getDate();
+    document.getElementById('quarter-done-badge').style.display = isQuarterLastDay ? 'block' : 'none';
+
+    // Рендерим ячейки месяцев (если квартал сменился)
+    const hint0 = document.getElementById('hint-0');
+    if (!hint0 || hint0.getAttribute('data-q') !== String(quarterStartMonth)) {
+        renderMonthsGrid(quarterStartMonth);
+        // Помечаем, какой квартал отрендерен
+        document.getElementById('hint-0').setAttribute('data-q', quarterStartMonth);
+    }
+
+    // Считаем для каждого месяца
+    let totalFullRev = 0, totalFullExp = 0, totalProjected = 0;
+    let totalFactRev = 0, totalForecastRev = 0, totalForecastExp = 0;
+    const monthData = [];
+
+    for (let i = 0; i < 3; i++) {
+        const X = quarterStartMonth + i;
+        const meta = computeMonthMeta(X, dataDate, year, m1, m2, m3, quarterStartMonth);
+
+        // Подпись
+        const hintEl = document.getElementById(`hint-${i}`);
+        if (hintEl) {
+            let hintPrefix = '';
+            if (meta.status === 'current') hintPrefix = 'По текущую дату: ';
+            else if (meta.status === 'past') hintPrefix = 'Данные по: ';
+            else hintPrefix = 'Данные по: ';
+            hintEl.textContent = `${hintPrefix}${meta.hintText}`;
+            hintEl.className = 'month-hint';
+            if (meta.status === 'past') hintEl.classList.add('closed');
+            else if (meta.status === 'future') hintEl.classList.add('future');
+        }
+
+        // Коэф
+        const coefEl = document.getElementById(`coef-${i}`);
+        if (coefEl) coefEl.textContent = `× ${meta.coef.toFixed(2)}`;
+
+        // Полная выручка/расходы
+        let fullRev = revenues[i], fullExp = expenses[i];
+        let forecastRev = 0, forecastExp = 0;
+
+        if (meta.status === 'current') {
+            const f = computeForecastForCurrent(X, dataDate, year, quarterStartMonth, revenues, expenses);
+            fullRev = f.fullRev;
+            fullExp = f.fullExp;
+            forecastRev = f.forecastRev;
+            forecastExp = f.forecastExp;
+        } else if (meta.status === 'future') {
+            fullRev = 0; fullExp = 0;
+        }
+
+        const projected = fullRev * meta.coef;
+
+        // Текст под ячейкой
+        const resultEl = document.getElementById(`result-${i}`);
+        if (resultEl) {
+            if (meta.status === 'future') {
+                resultEl.innerHTML = `<em>Месяц ещё не наступил</em>`;
             } else {
-                forecastSection.style.display = 'none';
+                let html = `Факт: <strong>${formatMoney(revenues[i])}</strong>`;
+                if (forecastRev > 0) html += ` + прогноз ${formatMoney(forecastRev)}`;
+                html += `<br>× ${meta.coef.toFixed(2)} = <strong>${formatMoney(projected)}</strong>`;
+                resultEl.innerHTML = html;
             }
         }
-    </script>
+
+        // Накопительные итоги
+        totalFactRev += revenues[i];
+        totalForecastRev += forecastRev;
+        totalForecastExp += forecastExp;
+        totalFullRev += fullRev;
+        totalFullExp += fullExp;
+        totalProjected += projected;
+
+        monthData.push({
+            name: MONTH_NAMES[X],
+            factRev: revenues[i],
+            forecastRev: forecastRev,
+            fullRev: fullRev,
+            coef: meta.coef,
+            projected: projected,
+            fullExp: fullExp,
+            status: meta.status,
+        });
+    }
+
+    // Итоговые карточки
+    document.getElementById('total-revenue').textContent = formatMoney(totalFullRev);
+    document.getElementById('total-projected').textContent = formatMoney(totalProjected);
+    document.getElementById('total-expense').textContent = formatMoney(totalFullExp);
+
+    const romiEl = document.getElementById('total-romi');
+    if (totalFullExp > 0) {
+        const romi = ((totalProjected - totalFullExp) / totalFullExp) * 100;
+        romiEl.textContent = romi.toFixed(1) + '%';
+        romiEl.className = 'value ' + (romi >= 0 ? 'positive' : 'negative');
+    } else {
+        romiEl.textContent = '—';
+        romiEl.className = 'value';
+    }
+
+    // Детальная таблица
+    const tbody = document.getElementById('detail-tbody');
+    tbody.innerHTML = '';
+    for (let i = 0; i < 3; i++) {
+        const m = monthData[i];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="month-cell-label">${m.name}</td>
+            <td class="num">${formatMoney(m.factRev)}</td>
+            <td class="num">${m.forecastRev > 0 ? formatMoney(m.forecastRev) : '—'}</td>
+            <td class="num">${formatMoney(m.fullRev)}</td>
+            <td class="num">× ${m.coef.toFixed(2)}</td>
+            <td class="num projected-val">${formatMoney(m.projected)}</td>
+            <td class="num">${formatMoney(m.fullExp)}</td>
+        `;
+        tbody.appendChild(tr);
+    }
+    // Итоговая строка
+    const totalTr = document.createElement('tr');
+    totalTr.className = 'total-row';
+    totalTr.innerHTML = `
+        <td class="month-cell-label">ИТОГО</td>
+        <td class="num">${formatMoney(totalFactRev)}</td>
+        <td class="num">${totalForecastRev > 0 ? formatMoney(totalForecastRev) : '—'}</td>
+        <td class="num">${formatMoney(totalFullRev)}</td>
+        <td class="num">—</td>
+        <td class="num projected-val">${formatMoney(totalProjected)}</td>
+        <td class="num">${formatMoney(totalFullExp)}</td>
+    `;
+    tbody.appendChild(totalTr);
+}
+
+// ================================================================
+// ПРОДУКТЫ
+// ================================================================
+
+function onProductChange() {
+    const product = document.getElementById('product').value;
+    if (!product) return;
+    const coefs = PRODUCT_COEFFICIENTS[product];
+    if (!coefs) return;
+    document.getElementById('coef-m1').value = coefs.m1.toFixed(2);
+    document.getElementById('coef-m2').value = coefs.m2.toFixed(2);
+    document.getElementById('coef-m3').value = coefs.m3.toFixed(2);
+    calculate();
+}
+
+function fillProductSelector() {
+    const select = document.getElementById('product');
+    for (const [key, val] of Object.entries(PRODUCT_COEFFICIENTS)) {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = val.name;
+        select.appendChild(opt);
+    }
+}
+
+// ================================================================
+// ИНИЦИАЛИЗАЦИЯ
+// ================================================================
+
+function init() {
+    fillProductSelector();
+
+    // Дата по умолчанию = вчера
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const y = yesterday.getFullYear();
+    const m = String(yesterday.getMonth() + 1).padStart(2, '0');
+    const d = String(yesterday.getDate()).padStart(2, '0');
+    document.getElementById('data-date').value = `${y}-${m}-${d}`;
+
+    calculate();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 </html>
