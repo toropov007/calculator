@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Калькулятор дотекающей выручки — Контур</title>
+    <title>Калькулятор прогноза выручки — Контур</title>
     <style>
         /* Kontur-style CSS */
         :root {
@@ -537,8 +537,8 @@
         <!-- Header with Product Selector -->
         <div class="header">
             <div class="header-top">
-                <h1>📊 Калькулятор дотекающей выручки</h1>
-                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v6.5 · 2026-06-30 22:02</div>
+                <h1>📊 Калькулятор прогноза выручки</h1>
+                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v6.6 · 2026-06-30 22:05</div>
                 <div class="product-selector">
                     <label for="product">Продукт:</label>
                     <select id="product" onchange="applyProductCoefficients(); calculate();">
@@ -575,7 +575,7 @@
             
             <!-- Coef Settings -->
             <div class="coef-settings">
-                <div class="coef-settings-title">Коэффициенты дотека (когортный анализ)</div>
+                <div class="coef-settings-title">Коэффициенты прогноза (когортный анализ)</div>
                 <div class="coef-row">
                     <div class="coef-item">
                         <label>m1 — 1 месяц оплат</label>
@@ -660,12 +660,12 @@
             </div>
 
             <p class="info-text">
-                💡 Коэффициенты дотека показывают, во сколько раз увеличится выручка от лидов к концу квартала. 
+                💡 Коэффициенты прогноза показывают, во сколько раз увеличится выручка от лидов к концу квартала. 
                 Например, при коэффициенте 1.25 итоговая выручка составит 125% от текущей.
             </p>
             <p class="info-text" style="background: #fff8e6; padding: 12px; border-radius: 6px; border-left: 3px solid var(--kontur-orange);">
-                ⚠️ <strong>Примечание:</strong> Для завершённых месяцев (апрель, май при дате в июне) показан <strong>итоговый дотёк</strong> 
-                на конец квартала. Фактически до конца квартала дотёк ещё продолжается, но калькулятор не корректирует 
+                ⚠️ <strong>Примечание:</strong> Для завершённых месяцев (апрель, май при дате в июне) показан <strong>итоговый прогноз выручки</strong> 
+                на конец квартала. Фактически до конца квартала прогноз выручки ещё уточняется, но калькулятор не корректирует 
                 коэффициенты пропорционально оставшемуся времени. Это консервативная оценка.
             </p>
         </div>
@@ -720,7 +720,7 @@
                         <th>Месяц</th>
                         <th class="number">Выручка</th>
                         <th class="number">Коэф.</th>
-                        <th class="number">Дотёк</th>
+                        <th class="number">Прогноз выручки</th>
                         <th class="number">Расходы</th>
                     </tr>
                 </thead>
@@ -950,17 +950,17 @@
             }
             
             // Get coefficients
-            const coefM1 = parseFloat(document.getElementById('coef-m1').value) || 1.25; // 1 месяц дотекания
+            const coefM1 = parseFloat(document.getElementById('coef-m1').value) || 1.25; // 1 месяц прогноза
             const coefM2 = parseFloat(document.getElementById('coef-m2').value) || 1.15; // 2 месяца
             const coefM3 = parseFloat(document.getElementById('coef-m3').value) || 1.08; // 3 месяца
 
-            // Для каждого месяца квартала считаем «сколько месяцев осталось дотекать» ОТНОСИТЕЛЬНО dataDate.
+            // Для каждого месяца квартала считаем N — «сколько полных месяцев данных доступно» на dataDate.
             // Правила:
-            //   - месяц завершился (dataDate >= 1-е число следующего) → выручка вся дотёкла, coef = 1.00
-            //   - месяц в процессе (dataDate в [1-е, последнее]) → дотекание = 1 месяц, coef = m1
+            //   - месяц завершился (dataDate >= 1-е число следующего) → данных N, см. правила ниже
+            //   - месяц в процессе (dataDate в [1-е, последнее]) → после прогноза = 1 месяц, coef = m1
             //   - месяц ещё не наступил, до его 1-го осталось 1 месяц → coef = m2
             //   - месяц ещё не наступил, до его 1-го осталось 2 месяца → coef = m3
-            // Метка «дотекает до ДД.ММ» = последний день дотекания (за день до 1-го следующего).
+            // Метка «по ДД МММ» = последний день, по который собирать данные.
 
             // Get revenue и expenses
             const revenues = [
@@ -985,7 +985,7 @@
                 const monthStart = new Date(year, monthIndex, 1);
                 const monthEnd = new Date(year, monthIndex + 1, 0); // Последний день месяца
                 const daysInMonth = monthEnd.getDate();
-                // Граница дотекания = 1-е число СЛЕДУЮЩЕГО месяца (после этого числа выручка за этот месяц перестаёт дотекать)
+                // Граница = 1-е число СЛЕДУЮЩЕГО месяца (после этого данные за X считаются закрытыми)
                 const leakDeadline = new Date(year, monthIndex + 1, 1);
 
                 // 1) Статус месяца относительно dataDate
@@ -1005,7 +1005,7 @@
                 //      N=1 (1 месяц данных):     подпись = по последний день X
                 //      N=2 (2 месяца данных):    подпись = по последний день X+1
                 //      N=3 (3 месяца данных):    подпись = по последний день X+2
-                //      N>=4: всё дотёкло, подпись = по dataDate
+                //      N>=4: данных за 4+ месяцев, подпись = по dataDate
                 //    Пример для 15.06.2026 (Q2):
                 //      Апр: N=2 (30.04, 31.05 ≤ 15.06) → подпись "по 31 мая" (конец X+1), коэф m2
                 //      Май: N=1 (только 31.05) → подпись "по 31 мая" (конец X), коэф m1
@@ -1028,7 +1028,7 @@
                 //     подпись = "по 1-е X" (данных нет)
                 //   если X закрыт:
                 //     подпись = по последний день X+(N-1)
-                //   N>=4 (всё дотёкло): подпись = по dataDate
+                //   N>=4: подпись = по dataDate
                 let labelDate;
                 if (monthStatus === 'current') {
                     labelDate = dataDate;
@@ -1045,13 +1045,13 @@
                 // N=1: X в процессе или только что закончился — грубый прогноз, m1
                 // N=2: X + следующий закрыт — m2
                 // N=3: X + два следующих закрыты — m3
-                // N>=4: всё дотёкло — 1.00
+                // N>=4: coef = 1.00
 
                 // 3) Коэффициент по N + monthStatus
                 //   current (месяц в процессе): после докидывания прогноза получаем «1 месяц данных» → всегда m1
                 //   N=0 future (месяц ещё не наступил): выручки нет, коэф не важен
                 //   N=1, 2, 3 — берём m1 / m2 / m3
-                //   N>=4: всё дотёкло
+                //   N>=4: данных за 4+ месяцев
                 let coefForMonth;
                 if (monthStatus === 'future') {
                     coefForMonth = 1.00; // выручки нет
@@ -1064,7 +1064,7 @@
                 } else if (N === 3) {
                     coefForMonth = coefM3;
                 } else {
-                    coefForMonth = 1.00; // всё дотёкло (N>=4)
+                    coefForMonth = 1.00; // данных достаточно (N>=4)
                 }
 
                 // 4) Подпись «по ДД МММ» — по какой день собирать выручку
@@ -1125,7 +1125,7 @@
                     fullMonthExp = 0;
                 }
 
-                // Дотёк = полная выручка месяца × коэффициент
+                // Прогноз выручки = полная выручка месяца × коэффициент
                 const projected = fullMonthRev * coefForMonth;
                 
                 monthResults.push({
@@ -1140,7 +1140,7 @@
                 });
 
                 baseTotalRev += revenues[i];
-                baseTotalProj += revenues[i] * coefForMonth; // Дотёк от факта
+                baseTotalProj += revenues[i] * coefForMonth; // Прогноз выручки от факта
                 baseTotalExp += expenses[i];
             }
             
@@ -1150,7 +1150,7 @@
             
             // Полные итоги с учётом прогноза
             const totalRev = baseTotalRev + totalForecastRev;
-            // Дотёк считается от ПОЛНОЙ выручки (факт + прогноз)
+            // Прогноз выручки считается от ПОЛНОЙ выручки (факт + прогноз)
             const totalProj = monthResults.reduce((sum, m) => sum + m.projected, 0);
             const totalExp = baseTotalExp + totalForecastExp;
             
@@ -1162,7 +1162,7 @@
             document.getElementById('badge-m2').textContent = `×${coefM2.toFixed(2)}`;
             document.getElementById('badge-m3').textContent = `×${coefM3.toFixed(2)}`;
 
-            // Update projected previews (дотёк от ПОЛНОЙ выручки)
+            // Update projected previews (прогноз от ПОЛНОЙ выручки)
             document.getElementById('proj-m1').textContent = `→ ${formatMoney(monthResults[0].projected)} (всего мес)`;
             document.getElementById('proj-m2').textContent = `→ ${formatMoney(monthResults[1].projected)} (всего мес)`;
             document.getElementById('proj-m3').textContent = `→ ${formatMoney(monthResults[2].projected)} (всего мес)`;
