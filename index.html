@@ -225,7 +225,7 @@
             font-weight: 500;
         }
 
-        /* «дотекает до ДД.ММ» — подпись под названием месяца */
+        /* «данные по ДД.МММ» — подпись под названием месяца: по какой день собирать выручку */
         .month-end-marker {
             font-size: 10px;
             color: var(--kontur-gray-500);
@@ -538,7 +538,7 @@
         <div class="header">
             <div class="header-top">
                 <h1>📊 Калькулятор дотекающей выручки</h1>
-                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v5.3 · 2026-06-30 21:13</div>
+                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v6 · 2026-06-30 21:30</div>
                 <div class="product-selector">
                     <label for="product">Продукт:</label>
                     <select id="product" onchange="applyProductCoefficients(); calculate();">
@@ -998,18 +998,49 @@
                     monthStatus = 'future';
                 }
 
-                // 2) N = сколько полных месяцев, считая сам X, в когорте на dataDate.
-                //    Месяц M (>= X) входит в когорту, если его ПОСЛЕДНИЙ день <= dataDate.
-                //    Примеры:
-                //      15.06 для апреля: lastDay(апр)=30.04 ≤ 15.06 ✓, lastDay(май)=31.05 ≤ 15.06 ✓, lastDay(июн)=30.06 > 15.06 ✗ → N=2 (m2)
-                //      30.06 для апреля: 30.04, 31.05, 30.06 — все три ≤ 30.06 → N=3 (m3)
-                //      30.06 для июня: 30.06 ≤ 30.06 ✓, 31.07 > 30.06 ✗ → N=1 (m1)
+                // 2) N = сколько полных месяцев данных по X (последний день месяца ≤ dataDate).
+                //    Подпись = "по ДД МММ" = "по какой день собирать выручку, чтобы получить текущий коэф".
+                //    Логика:
+                //      N=0 (X ещё не наступил): выручки нет, подпись = "по 1-е X"
+                //      N=1 (1 месяц данных):     подпись = по последний день X
+                //      N=2 (2 месяца данных):    подпись = по последний день X+1
+                //      N=3 (3 месяца данных):    подпись = по последний день X+2
+                //      N>=4: всё дотёкло, подпись = по dataDate
+                //    Пример для 15.06.2026 (Q2):
+                //      Апр: N=2 (30.04, 31.05 ≤ 15.06) → подпись "по 31 мая" (конец X+1), коэф m2
+                //      Май: N=1 (только 31.05) → подпись "по 31 мая" (конец X), коэф m1
+                //      Июнь: N=0 → подпись "по 1 июня", коэф m1 (грубый)
+                //    Пример для 30.06.2026:
+                //      Апр: N=3 (30.04, 31.05, 30.06) → "по 30 июня" (конец X+2), m3
+                //      Май: N=2 → "по 30 июня" (конец X+1), m2
+                //      Июнь: N=1 → "по 30 июня" (конец X), m1
                 let N = 0;
                 for (let k = 0; k < 12; k++) {
                     const lastDay = new Date(year, monthIndex + k + 1, 0);
                     if (dataDate >= lastDay) N++;
                     else break;
                 }
+
+                // Дата подписи:
+                //   если X в процессе (monthStatus === 'current' → dataDate между 1-м X и 1-м X+1):
+                //     подпись = "по dataDate" (столько данных уже есть)
+                //   если X ещё не наступил (N=0 и monthStatus === 'future'):
+                //     подпись = "по 1-е X" (данных нет)
+                //   если X закрыт:
+                //     подпись = по последний день X+(N-1)
+                //   N>=4 (всё дотёкло): подпись = по dataDate
+                let labelDate;
+                if (monthStatus === 'current') {
+                    labelDate = dataDate;
+                } else if (N === 0) {
+                    labelDate = new Date(year, monthIndex, 1);
+                } else if (N >= 4) {
+                    labelDate = dataDate;
+                } else {
+                    labelDate = new Date(year, monthIndex + N, 0);
+                }
+                const dd = String(labelDate.getDate()).padStart(2, '0');
+                const mm = monthNames[labelDate.getMonth()];
                 // N=0: X ещё не наступил (или dataDate раньше 1-го X) — выручки нет
                 // N=1: X в процессе или только что закончился — грубый прогноз, m1
                 // N=2: X + следующий закрыт — m2
@@ -1031,17 +1062,14 @@
                     coefForMonth = 1.00; // всё дотёкло
                 }
 
-                // 4) Метка «дотекает до ДД МММ» — последний день дотекания (= leakDeadline - 1 день)
-                const lastLeakDay = new Date(leakDeadline.getTime() - 24*60*60*1000);
-                const dd = String(lastLeakDay.getDate()).padStart(2, '0');
-                const mm = monthNames[lastLeakDay.getMonth()];
+                // 4) Подпись «по ДД МММ» — по какой день собирать выручку
                 if (typeof window.monthCoefs === 'undefined') { window.monthCoefs = []; window.monthEndLabels = []; }
                 if (window.monthCoefs.length < 3) {
                     window.monthCoefs.push(coefForMonth);
-                    window.monthEndLabels.push({ text: `дотекает до ${dd} ${mm}`, status: monthStatus, N: N });
+                    window.monthEndLabels.push({ text: `данные по ${dd} ${mm}`, status: monthStatus, N: N });
                 } else {
                     window.monthCoefs[i] = coefForMonth;
-                    window.monthEndLabels[i] = { text: `дотекает до ${dd} ${mm}`, status: monthStatus, N: N };
+                    window.monthEndLabels[i] = { text: `данные по ${dd} ${mm}`, status: monthStatus, N: N };
                 }
 
                 let daysPassedInMonth = 0;
