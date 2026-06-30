@@ -538,7 +538,7 @@
         <div class="header">
             <div class="header-top">
                 <h1>📊 Калькулятор дотекающей выручки</h1>
-                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v5.2 · 2026-06-30 21:12</div>
+                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v5.3 · 2026-06-30 21:13</div>
                 <div class="product-selector">
                     <label for="product">Продукт:</label>
                     <select id="product" onchange="applyProductCoefficients(); calculate();">
@@ -566,7 +566,6 @@
             <div class="data-date-section">
                 <label for="data-date">Данные актуальны на:</label>
                 <input type="date" id="data-date" onchange="calculate()">
-                <span class="forecast-badge" id="forecast-badge">Прогноз активен</span>
             </div>
         </div>
 
@@ -1246,17 +1245,10 @@
         // Отображение прогноза
         function updateForecastDisplay(forecastRev, forecastExp, isActive) {
             const forecastSection = document.getElementById('forecast-section');
-            const forecastBadge = document.getElementById('forecast-badge');
-
             if (isActive && forecastRev > 0) {
                 forecastSection.style.display = 'block';
-                forecastBadge.style.display = 'inline-block';
-
-                document.getElementById('forecast-revenue').textContent = `+${formatMoney(forecastRev)}`;
-                document.getElementById('forecast-expense').textContent = `+${formatMoney(forecastExp)}`;
             } else {
                 forecastSection.style.display = 'none';
-                forecastBadge.style.display = 'none';
             }
         }
     </script>
