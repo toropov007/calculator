@@ -475,6 +475,34 @@
             font-weight: 600;
             color: var(--kontur-gray-900);
         }
+
+        /* Quarter ended warning */
+        .quarter-ended-warning {
+            background: #fff8e1;
+            border: 1px solid var(--kontur-orange);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            box-shadow: var(--kontur-shadow);
+        }
+
+        .quarter-ended-warning .warning-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .quarter-ended-warning .warning-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--kontur-gray-900);
+        }
+
+        .quarter-ended-warning .warning-text strong {
+            color: var(--kontur-orange);
+        }
     </style>
 </head>
 <body>
@@ -544,7 +572,7 @@
                         <span class="month-name">Месяц 1</span>
                         <span class="coef-badge" id="badge-m1">×1.08 (m3)</span>
                     </div>
-                    <input type="number" id="revenue-m1" placeholder="Выручка" oninput="calculate()">
+                    <input type="number" id="revenue-m1" placeholder="Выручка (по 1 число след. мес)" oninput="calculate()">
                     <div class="projected" id="proj-m1">→ 0 ₽</div>
                 </div>
                 <div class="input-cell">
@@ -552,7 +580,7 @@
                         <span class="month-name">Месяц 2</span>
                         <span class="coef-badge" id="badge-m2">×1.15 (m2)</span>
                     </div>
-                    <input type="number" id="revenue-m2" placeholder="Выручка" oninput="calculate()">
+                    <input type="number" id="revenue-m2" placeholder="Выручка (по 1 число след. мес)" oninput="calculate()">
                     <div class="projected" id="proj-m2">→ 0 ₽</div>
                 </div>
                 <div class="input-cell">
@@ -560,7 +588,7 @@
                         <span class="month-name">Месяц 3</span>
                         <span class="coef-badge" id="badge-m3">×1.25 (m1)</span>
                     </div>
-                    <input type="number" id="revenue-m3" placeholder="Выручка" oninput="calculate()">
+                    <input type="number" id="revenue-m3" placeholder="Выручка (факт на текущую дату)" oninput="calculate()">
                     <div class="projected" id="proj-m3">→ 0 ₽</div>
                 </div>
                 <div class="input-cell" style="background: #fff3e0;">
@@ -631,6 +659,15 @@
                     <div class="label">Прогноз расходов (дневной)</div>
                     <div class="value" id="forecast-expense">—</div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Quarter Ended Warning (shown when data date >= quarter end) -->
+        <div class="quarter-ended-warning" id="quarter-ended-warning" style="display: none;">
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-text">
+                <strong>Квартал завершён.</strong> Выручка внесена по конец квартала. 
+                Прогноз дотекания отключён. Коэффициенты: m3 для первого месяца, m2 для второго, m1 для текущего.
             </div>
         </div>
 
@@ -864,7 +901,12 @@
                 quarterStartMonth + 1,
                 quarterStartMonth + 2
             ];
-            
+
+            // Последний день квартала
+            const quarterEnd = new Date(year, quarterStartMonth + 3, 0);
+            // Квартал завершён: dataDate == quarterEnd (последний день) или позже
+            const quarterEnded = dataDate >= quarterEnd;
+
             const monthNames = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
             
             // Обновляем названия месяцев в UI
@@ -914,19 +956,27 @@
                 
                 if (dataDate >= monthStart) {
                     if (dataDate <= monthEnd) {
-                        // Месяц ещё идёт — считаем прогноз
-                        daysPassedInMonth = dataDate.getDate();
-                        const daysRemaining = daysInMonth - daysPassedInMonth;
-                        
-                        if (daysPassedInMonth > 0 && revenues[i] > 0) {
-                            const dailyRev = revenues[i] / daysPassedInMonth;
-                            const dailyExp = expenses[i] / daysPassedInMonth;
-                            forecastRev = dailyRev * daysRemaining;
-                            forecastExp = dailyExp * daysRemaining;
+                        // Квартал завершён и dataDate == quarterEnd (т.е. месяц тоже завершён) — прогноз не считаем
+                        // В общем случае, если месяц в квартале идёт — считаем прогноз
+                        if (!quarterEnded) {
+                            // Месяц ещё идёт — считаем прогноз
+                            daysPassedInMonth = dataDate.getDate();
+                            const daysRemaining = daysInMonth - daysPassedInMonth;
+                            
+                            if (daysPassedInMonth > 0 && revenues[i] > 0) {
+                                const dailyRev = revenues[i] / daysPassedInMonth;
+                                const dailyExp = expenses[i] / daysPassedInMonth;
+                                forecastRev = dailyRev * daysRemaining;
+                                forecastExp = dailyExp * daysRemaining;
+                            }
+                            
+                            fullMonthRev = revenues[i] + forecastRev;
+                            fullMonthExp = expenses[i] + forecastExp;
+                        } else {
+                            // Квартал завершён — берём факт как есть, без прогноза
+                            fullMonthRev = revenues[i];
+                            fullMonthExp = expenses[i];
                         }
-                        
-                        fullMonthRev = revenues[i] + forecastRev;
-                        fullMonthExp = expenses[i] + forecastExp;
                     }
                     // Если dataDate > monthEnd — месяц уже закончился, прогноз = 0
                 } else {
@@ -1022,7 +1072,13 @@
 
             // Update forecast display
             updateForecastDisplay(totalForecastRev, totalForecastExp, totalForecastRev > 0);
-            
+
+            // Показываем плашку «квартал завершён» вместо forecast-section, если квартал кончился
+            const warningEl = document.getElementById('quarter-ended-warning');
+            if (warningEl) {
+                warningEl.style.display = quarterEnded ? 'flex' : 'none';
+            }
+
             // Сохраняем данные
             saveData();
         }
