@@ -538,7 +538,7 @@
         <div class="header">
             <div class="header-top">
                 <h1>📊 Калькулятор дотекающей выручки</h1>
-                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v5 · 2026-06-30 21:00</div>
+                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v5.1 · 2026-06-30 21:10</div>
                 <div class="product-selector">
                     <label for="product">Продукт:</label>
                     <select id="product" onchange="applyProductCoefficients(); calculate();">
@@ -998,12 +998,15 @@
                 }
 
                 // 2) N = сколько полных месяцев, считая сам X, в когорте на dataDate.
-                //    Месяц M (>= X) входит в когорту, если dataDate >= 1-е число M.
-                //    Останавливаемся на первом месяце, который НЕ вошёл.
+                //    Месяц M (>= X) входит в когорту, если его ПОСЛЕДНИЙ день <= dataDate.
+                //    Примеры:
+                //      15.06 для апреля: lastDay(апр)=30.04 ≤ 15.06 ✓, lastDay(май)=31.05 ≤ 15.06 ✓, lastDay(июн)=30.06 > 15.06 ✗ → N=2 (m2)
+                //      30.06 для апреля: 30.04, 31.05, 30.06 — все три ≤ 30.06 → N=3 (m3)
+                //      30.06 для июня: 30.06 ≤ 30.06 ✓, 31.07 > 30.06 ✗ → N=1 (m1)
                 let N = 0;
                 for (let k = 0; k < 12; k++) {
-                    const firstOfM = new Date(year, monthIndex + k, 1);
-                    if (dataDate >= firstOfM) N++;
+                    const lastDay = new Date(year, monthIndex + k + 1, 0);
+                    if (dataDate >= lastDay) N++;
                     else break;
                 }
                 // N=0: X ещё не наступил (или dataDate раньше 1-го X) — выручки нет
