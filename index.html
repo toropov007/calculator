@@ -59,6 +59,17 @@
             margin-bottom: 16px;
         }
 
+        .version-badge {
+            font-size: 11px;
+            color: var(--kontur-gray-500);
+            background: var(--kontur-gray-100);
+            border: 1px solid var(--kontur-gray-200);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            letter-spacing: 0.02em;
+        }
+
         h1 {
             font-size: 24px;
             font-weight: 600;
@@ -212,6 +223,22 @@
         .input-cell .label .month-name {
             color: var(--kontur-gray-700);
             font-weight: 500;
+        }
+
+        /* «дотекает до ДД.ММ» — подпись под названием месяца */
+        .month-end-marker {
+            font-size: 10px;
+            color: var(--kontur-gray-500);
+            margin-top: 2px;
+            font-weight: 400;
+            line-height: 1.2;
+        }
+        .month-end-marker.leaked {
+            color: var(--kontur-green);
+        }
+        .month-end-marker.current {
+            color: var(--kontur-orange);
+            font-weight: 600;
         }
 
         .input-cell .label .coef-badge {
@@ -511,6 +538,7 @@
         <div class="header">
             <div class="header-top">
                 <h1>📊 Калькулятор дотекающей выручки</h1>
+                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v4 · 2026-06-30 20:35</div>
                 <div class="product-selector">
                     <label for="product">Продукт:</label>
                     <select id="product" onchange="applyProductCoefficients(); calculate();">
@@ -666,8 +694,8 @@
         <div class="quarter-ended-warning" id="quarter-ended-warning" style="display: none;">
             <div class="warning-icon">⚠️</div>
             <div class="warning-text">
-                <strong>Квартал завершён.</strong> Выручка внесена по конец квартала. 
-                Прогноз дотекания отключён. Коэффициенты: m3 для первого месяца, m2 для второго, m1 для текущего.
+                <strong>Квартал завершён.</strong> Выручка внесена по конец квартала.
+                Прогноз дотекания отключён. Коэффициенты рассчитаны по факту остатка дотекания каждого месяца.
             </div>
         </div>
 
@@ -909,19 +937,36 @@
 
             const monthNames = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
             
-            // Обновляем названия месяцев в UI
-            document.querySelectorAll('.compact-grid .month-name')[0].textContent = monthNames[quarterStartMonth];
-            document.querySelectorAll('.compact-grid .month-name')[1].textContent = monthNames[quarterStartMonth + 1];
-            document.querySelectorAll('.compact-grid .month-name')[2].textContent = monthNames[quarterStartMonth + 2];
+            // Обновляем названия месяцев и метки «дотекает до» в UI
+            const monthNameEls = document.querySelectorAll('.compact-grid .month-name');
+            for (let i = 0; i < 3; i++) {
+                if (!monthNameEls[i]) continue;
+                monthNameEls[i].textContent = monthNames[monthsInQuarter[i]];
+                let marker = monthNameEls[i].parentElement.querySelector('.month-end-marker');
+                if (!marker) {
+                    marker = document.createElement('div');
+                    marker.className = 'month-end-marker';
+                    monthNameEls[i].parentElement.appendChild(marker);
+                }
+                const ml = (window.monthEndLabels && window.monthEndLabels[i]) || {text: '', status: 'future'};
+                marker.textContent = ml.text;
+                marker.classList.remove('leaked', 'current');
+                if (ml.status === 'past') marker.classList.add('leaked');
+                else if (ml.status === 'current') marker.classList.add('current');
+            }
             
             // Get coefficients
-            const coefM1 = parseFloat(document.getElementById('coef-m1').value) || 1.25; // 1 месяц
+            const coefM1 = parseFloat(document.getElementById('coef-m1').value) || 1.25; // 1 месяц дотекания
             const coefM2 = parseFloat(document.getElementById('coef-m2').value) || 1.15; // 2 месяца
             const coefM3 = parseFloat(document.getElementById('coef-m3').value) || 1.08; // 3 месяца
-            
-            // Применяем коэффициенты в зависимости от количества месяцев с оплатами:
-            // Месяц 1 → m3 (3 месяца прошло), Месяц 2 → m2 (2 месяца), Месяц 3 → m1 (1 месяц)
-            const coefs = [coefM3, coefM2, coefM1];
+
+            // Для каждого месяца квартала считаем «сколько месяцев осталось дотекать» ОТНОСИТЕЛЬНО dataDate.
+            // Правила:
+            //   - месяц завершился (dataDate >= 1-е число следующего) → выручка вся дотёкла, coef = 1.00
+            //   - месяц в процессе (dataDate в [1-е, последнее]) → дотекание = 1 месяц, coef = m1
+            //   - месяц ещё не наступил, до его 1-го осталось 1 месяц → coef = m2
+            //   - месяц ещё не наступил, до его 1-го осталось 2 месяца → coef = m3
+            // Метка «дотекает до ДД.ММ» = последний день дотекания (за день до 1-го следующего).
 
             // Get revenue и expenses
             const revenues = [
@@ -946,48 +991,81 @@
                 const monthStart = new Date(year, monthIndex, 1);
                 const monthEnd = new Date(year, monthIndex + 1, 0); // Последний день месяца
                 const daysInMonth = monthEnd.getDate();
-                
-                // Сколько дней прошло в этом месяце на дату dataDate?
+                // Граница дотекания = 1-е число СЛЕДУЮЩЕГО месяца (после этого числа выручка за этот месяц перестаёт дотекать)
+                const leakDeadline = new Date(year, monthIndex + 1, 1);
+
+                // 1) Статус месяца относительно dataDate
+                let monthStatus; // 'past' | 'current' | 'future'
+                if (dataDate >= leakDeadline) {
+                    monthStatus = 'past';
+                } else if (dataDate >= monthStart) {
+                    monthStatus = 'current';
+                } else {
+                    monthStatus = 'future';
+                }
+
+                // 2) Сколько месяцев осталось до leakDeadline
+                let monthsToDeadline = 0;
+                if (monthStatus === 'past') {
+                    monthsToDeadline = 0;
+                } else {
+                    // разница в месяцах между (dataDate) и (leakDeadline)
+                    const y1 = dataDate.getFullYear(), m1d = dataDate.getMonth();
+                    const y2 = leakDeadline.getFullYear(), m2d = leakDeadline.getMonth();
+                    monthsToDeadline = (y2 - y1) * 12 + (m2d - m1d);
+                    if (monthsToDeadline < 0) monthsToDeadline = 0;
+                }
+
+                // 3) Маппинг на коэффициент
+                let coefForMonth;
+                if (monthsToDeadline === 0) coefForMonth = 1.00;
+                else if (monthsToDeadline === 1) coefForMonth = coefM1;
+                else if (monthsToDeadline === 2) coefForMonth = coefM2;
+                else coefForMonth = coefM3;
+
+                // 4) Метка «дотекает до ДД МММ» — последний день дотекания
+                const lastLeakDay = new Date(leakDeadline.getTime() - 24*60*60*1000);
+                const dd = String(lastLeakDay.getDate()).padStart(2, '0');
+                const mm = monthNames[lastLeakDay.getMonth()];
+                // Запоминаем в массивы — используем ниже в UI
+                if (typeof monthCoefs === 'undefined') { window.monthCoefs = []; window.monthEndLabels = []; }
+                if (window.monthCoefs.length < 3) { window.monthCoefs.push(coefForMonth); window.monthEndLabels.push({text: `дотекает до ${dd} ${mm}`, status: monthStatus}); }
+                else { window.monthCoefs[i] = coefForMonth; window.monthEndLabels[i] = {text: `дотекает до ${dd} ${mm}`, status: monthStatus}; }
+
                 let daysPassedInMonth = 0;
                 let forecastRev = 0;
                 let forecastExp = 0;
                 let fullMonthRev = revenues[i];
                 let fullMonthExp = expenses[i];
-                
+
                 if (dataDate >= monthStart) {
                     if (dataDate <= monthEnd) {
-                        // Квартал завершён и dataDate == quarterEnd (т.е. месяц тоже завершён) — прогноз не считаем
-                        // В общем случае, если месяц в квартале идёт — считаем прогноз
-                        if (!quarterEnded) {
-                            // Месяц ещё идёт — считаем прогноз
+                        if (monthStatus === 'current' && !quarterEnded) {
                             daysPassedInMonth = dataDate.getDate();
                             const daysRemaining = daysInMonth - daysPassedInMonth;
-                            
+
                             if (daysPassedInMonth > 0 && revenues[i] > 0) {
                                 const dailyRev = revenues[i] / daysPassedInMonth;
                                 const dailyExp = expenses[i] / daysPassedInMonth;
                                 forecastRev = dailyRev * daysRemaining;
                                 forecastExp = dailyExp * daysRemaining;
                             }
-                            
+
                             fullMonthRev = revenues[i] + forecastRev;
                             fullMonthExp = expenses[i] + forecastExp;
                         } else {
-                            // Квартал завершён — берём факт как есть, без прогноза
                             fullMonthRev = revenues[i];
                             fullMonthExp = expenses[i];
                         }
                     }
-                    // Если dataDate > monthEnd — месяц уже закончился, прогноз = 0
                 } else {
-                    // Месяц ещё не начался — вся выручка = прогноз на основе предыдущих
-                    // Пока оставляем 0 или можно добавить логику прогноза
-                    fullMonthRev = revenues[i]; // Или 0 если не введено
-                    fullMonthExp = expenses[i];
+                    // месяц ещё не наступил
+                    fullMonthRev = 0;
+                    fullMonthExp = 0;
                 }
-                
+
                 // Дотёк = полная выручка месяца × коэффициент
-                const projected = fullMonthRev * coefs[i];
+                const projected = fullMonthRev * coefForMonth;
                 
                 monthResults.push({
                     revenue: revenues[i],
@@ -997,11 +1075,11 @@
                     fullRev: fullMonthRev,
                     fullExp: fullMonthExp,
                     projected: projected,
-                    coef: coefs[i]
+                    coef: coefForMonth
                 });
-                
+
                 baseTotalRev += revenues[i];
-                baseTotalProj += revenues[i] * coefs[i]; // Дотёк от факта
+                baseTotalProj += revenues[i] * coefForMonth; // Дотёк от факта
                 baseTotalExp += expenses[i];
             }
             
