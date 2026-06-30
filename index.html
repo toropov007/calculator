@@ -538,7 +538,7 @@
         <div class="header">
             <div class="header-top">
                 <h1>📊 Калькулятор дотекающей выручки</h1>
-                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v6.1 · 2026-06-30 21:35</div>
+                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v6.2 · 2026-06-30 21:55</div>
                 <div class="product-selector">
                     <label for="product">Продукт:</label>
                     <select id="product" onchange="applyProductCoefficients(); calculate();">
@@ -1172,10 +1172,10 @@
             document.getElementById('revenue-total').value = baseTotalRev > 0 ? baseTotalRev : '';
             document.getElementById('expense-total').value = baseTotalExp > 0 ? baseTotalExp : '';
 
-            // Update badge values
-            document.getElementById('badge-m1').textContent = `×${coefM3.toFixed(2)} (m3)`;
-            document.getElementById('badge-m2').textContent = `×${coefM2.toFixed(2)} (m2)`;
-            document.getElementById('badge-m3').textContent = `×${coefM1.toFixed(2)} (m1)`;
+            // Update badge values (актуальные коэфы для каждого месяца квартала на текущую дату)
+            document.getElementById('badge-m1').textContent = `×${monthResults[0].coef.toFixed(2)}`;
+            document.getElementById('badge-m2').textContent = `×${monthResults[1].coef.toFixed(2)}`;
+            document.getElementById('badge-m3').textContent = `×${monthResults[2].coef.toFixed(2)}`;
 
             // Update results cards
             const productName = productCoefficients[product].name;
@@ -1194,10 +1194,10 @@
             document.getElementById('table-rev-m3').textContent = formatMoney(monthResults[2].revenue) + (monthResults[2].forecastRev > 0 ? ` + ${formatMoney(monthResults[2].forecastRev)}` : '');
             document.getElementById('table-rev-total').textContent = formatMoney(totalRev);
 
-            // m1 применяется к месяцу 3, m2 к месяцу 2, m3 к месяцу 1
-            document.getElementById('table-coef-m1').textContent = `×${coefM3.toFixed(2)}`;
-            document.getElementById('table-coef-m2').textContent = `×${coefM2.toFixed(2)}`;
-            document.getElementById('table-coef-m3').textContent = `×${coefM1.toFixed(2)}`;
+            // коэфы для каждого месяца квартала на текущую дату
+            document.getElementById('table-coef-m1').textContent = `×${monthResults[0].coef.toFixed(2)}`;
+            document.getElementById('table-coef-m2').textContent = `×${monthResults[1].coef.toFixed(2)}`;
+            document.getElementById('table-coef-m3').textContent = `×${monthResults[2].coef.toFixed(2)}`;
 
             document.getElementById('table-proj-m1').textContent = formatMoney(monthResults[0].projected);
             document.getElementById('table-proj-m2').textContent = formatMoney(monthResults[1].projected);
@@ -1222,11 +1222,10 @@
             saveData();
         }
 
-        // Сохранение данных в localStorage
+        // Сохранение данных в localStorage (data-date HE сохраняем — при каждой загрузке ставится «вчера»)
         function saveData() {
             const data = {
                 product: document.getElementById('product').value,
-                dataDate: document.getElementById('data-date').value,
                 revenue: {
                     m1: document.getElementById('revenue-m1').value,
                     m2: document.getElementById('revenue-m2').value,
@@ -1255,7 +1254,7 @@
                 const data = JSON.parse(saved);
                 
                 if (data.product) document.getElementById('product').value = data.product;
-                if (data.dataDate) document.getElementById('data-date').value = data.dataDate;
+                // data-date не подгружаем — всегда ставится «вчера» при загрузке страницы
                 if (data.revenue) {
                     if (data.revenue.m1) document.getElementById('revenue-m1').value = data.revenue.m1;
                     if (data.revenue.m2) document.getElementById('revenue-m2').value = data.revenue.m2;
