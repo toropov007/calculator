@@ -538,7 +538,7 @@
         <div class="header">
             <div class="header-top">
                 <h1>📊 Калькулятор дотекающей выручки</h1>
-                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v6 · 2026-06-30 21:30</div>
+                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v6.1 · 2026-06-30 21:35</div>
                 <div class="product-selector">
                     <label for="product">Продукт:</label>
                     <select id="product" onchange="applyProductCoefficients(); calculate();">
@@ -1047,11 +1047,16 @@
                 // N=3: X + два следующих закрыты — m3
                 // N>=4: всё дотёкло — 1.00
 
-                // 3) Коэффициент по N
+                // 3) Коэффициент по N + monthStatus
+                //   current (месяц в процессе): после докидывания прогноза получаем «1 месяц данных» → всегда m1
+                //   N=0 future (месяц ещё не наступил): выручки нет, коэф не важен
+                //   N=1, 2, 3 — берём m1 / m2 / m3
+                //   N>=4: всё дотёкло
                 let coefForMonth;
-                if (N === 0) {
-                    // месяц ещё не наступил — выручки нет, коэф не важен (вернём 1.00)
-                    coefForMonth = 1.00;
+                if (monthStatus === 'future') {
+                    coefForMonth = 1.00; // выручки нет
+                } else if (monthStatus === 'current') {
+                    coefForMonth = coefM1; // в процессе: всегда m1
                 } else if (N === 1) {
                     coefForMonth = coefM1;
                 } else if (N === 2) {
@@ -1059,7 +1064,7 @@
                 } else if (N === 3) {
                     coefForMonth = coefM3;
                 } else {
-                    coefForMonth = 1.00; // всё дотёкло
+                    coefForMonth = 1.00; // всё дотёкло (N>=4)
                 }
 
                 // 4) Подпись «по ДД МММ» — по какой день собирать выручку
@@ -1078,28 +1083,44 @@
                 let fullMonthRev = revenues[i];
                 let fullMonthExp = expenses[i];
 
-                if (dataDate >= monthStart) {
-                    if (dataDate <= monthEnd) {
-                        if (monthStatus === 'current' && !quarterEnded) {
-                            daysPassedInMonth = dataDate.getDate();
-                            const daysRemaining = daysInMonth - daysPassedInMonth;
-
-                            if (daysPassedInMonth > 0 && revenues[i] > 0) {
-                                const dailyRev = revenues[i] / daysPassedInMonth;
-                                const dailyExp = expenses[i] / daysPassedInMonth;
-                                forecastRev = dailyRev * daysRemaining;
-                                forecastExp = dailyExp * daysRemaining;
-                            }
-
-                            fullMonthRev = revenues[i] + forecastRev;
-                            fullMonthExp = expenses[i] + forecastExp;
-                        } else {
-                            fullMonthRev = revenues[i];
-                            fullMonthExp = expenses[i];
+                if (monthStatus === 'current' && !quarterEnded) {
+                    // Месяц X в процессе. Среднедневная = (выручка за все предыдущие закрытые месяцы квартала + выручка за X по dataDate) /
+                    //                                  (дни этих предыдущих месяцев + dataDate.getDate())
+                    // Прогноз на оставшиеся дни X = среднедневная * (daysInMonth - dataDate.getDate()).
+                    let kohortRev = 0;
+                    let kohortExp = 0;
+                    let kohortDays = 0;
+                    // 1) предыдущие месяцы квартала, которые закрыты (lastDay ≤ dataDate)
+                    for (let p = 0; p < i; p++) {
+                        const pMonthIdx = monthsInQuarter[p];
+                        const pEnd = new Date(year, pMonthIdx + 1, 0);
+                        if (dataDate >= pEnd) {
+                            kohortRev += revenues[p];
+                            kohortExp += expenses[p];
+                            kohortDays += pEnd.getDate();
                         }
                     }
+                    // 2) сам X (по dataDate)
+                    kohortRev += revenues[i];
+                    kohortExp += expenses[i];
+                    kohortDays += dataDate.getDate();
+
+                    const daysRemaining = daysInMonth - dataDate.getDate();
+                    if (kohortDays > 0 && daysRemaining > 0) {
+                        const dailyRev = kohortRev / kohortDays;
+                        const dailyExp = kohortExp / kohortDays;
+                        forecastRev = dailyRev * daysRemaining;
+                        forecastExp = dailyExp * daysRemaining;
+                    }
+                    daysPassedInMonth = dataDate.getDate();
+                    fullMonthRev = revenues[i] + forecastRev;
+                    fullMonthExp = expenses[i] + forecastExp;
+                } else if (monthStatus === 'past') {
+                    // Месяц закрыт — берём факт как есть
+                    fullMonthRev = revenues[i];
+                    fullMonthExp = expenses[i];
                 } else {
-                    // месяц ещё не наступил
+                    // monthStatus === 'future' — месяц ещё не наступил
                     fullMonthRev = 0;
                     fullMonthExp = 0;
                 }
