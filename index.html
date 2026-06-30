@@ -538,7 +538,7 @@
         <div class="header">
             <div class="header-top">
                 <h1>📊 Калькулятор дотекающей выручки</h1>
-                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v5.1 · 2026-06-30 21:10</div>
+                <div class="version-badge" id="version-badge" title="Версия и дата сборки">v5.2 · 2026-06-30 21:12</div>
                 <div class="product-selector">
                     <label for="product">Продукт:</label>
                     <select id="product" onchange="applyProductCoefficients(); calculate();">
@@ -836,8 +836,10 @@
             // Update display (изначально от текущей даты)
             updateQuarterDisplay(year, quarter, quarterNames, monthNames, quarterStartMonth, quarterEndMonth, totalDays, passedDays, remainingDays, progress);
             
-            // Set default data date to today
-            document.getElementById('data-date').valueAsDate = today;
+            // Set default data date to YESTERDAY (last fully closed day of data)
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            document.getElementById('data-date').valueAsDate = yesterday;
             
             // Заполняем селектор продуктов из productCoefficients
             populateProductSelector();
