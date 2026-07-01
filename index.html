@@ -345,7 +345,7 @@
 
     <!-- Total cards -->
     <div class="section">
-        <div class="section-title">📋 Итоговые показатели</div>
+        <div class="section-title" id="total-title">📋 Итоговые показатели</div>
         <div class="total-grid">
             <div class="total-card normal">
                 <div class="label">Выручка (факт + прогноз)</div>
@@ -795,6 +795,11 @@ function onProductChange() {
     document.getElementById('coef-m1').value = coefs.m1.toFixed(2);
     document.getElementById('coef-m2').value = coefs.m2.toFixed(2);
     document.getElementById('coef-m3').value = coefs.m3.toFixed(2);
+    // Обновить заголовок блока итоговых показателей названием выбранного продукта
+    const totalTitle = document.getElementById('total-title');
+    if (totalTitle) {
+        totalTitle.textContent = '📋 Итоговые показатели — ' + coefs.name;
+    }
     calculate();
 }
 
